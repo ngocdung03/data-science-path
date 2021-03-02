@@ -13,3 +13,4 @@
 - Difference between list and dictionary:
     - List can be in order
     - Dictionary holds more information than list
+- Truthy and Falsy: Falsy value: None, 0, anything empty (string, list,...)
