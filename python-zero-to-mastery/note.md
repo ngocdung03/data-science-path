@@ -1,2 +1,15 @@
 - repl.it: can write Python codes online or other translator programs
 - glot.io: similar
+- Python documentation: docs.python.org
+- String is immutable if we change one or more elements of it
+- Best practices for commenting: realpython.com/python-comments-guide/#python-commenting-best-practices
+- Docstrings convention: https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
+- List:
+    - Reverse a list: basket.reverse = basket[::-1]
+    - Copy a list: basket[:]
+    - Get a continuous list: list(range(...))
+    - `.join()`: `' '.join('hi', 'my', 'name', 'is', 'JOJO')`
+    - Unpack a list: `a,b,c,*other,d = [1,2,3,4,5,6]` or `a,b,c = 1,2,3`
+- Difference between list and dictionary:
+    - List can be in order
+    - Dictionary holds more information than list
