@@ -14,3 +14,4 @@
     - List can be in order
     - Dictionary holds more information than list
 - Truthy and Falsy: Falsy value: None, 0, anything empty (string, list,...)
+- Ternary Operator: condiion_if_true if conditionelse condition_if_else
