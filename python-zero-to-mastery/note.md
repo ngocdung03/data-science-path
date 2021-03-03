@@ -45,3 +45,29 @@ can_message = "message allowed" if is_friend else "not allowed to message"
     print(super_func(1,2,3,4,num1=8, num2=10)) #print a dictionary with 2 elements
     ```
     - Rule: params, *args, default parameters, **kwargs: `super_func(name, *args, i='hi', **kwargs)`
+- Install Python: Add to PATH
+- Terminal: Using powershell on Windown: same commands on Mac or Linux can be applied 
+    - pwd: present working directory
+    - clear
+    - cd /: to the root directory
+    - ls: list
+    - cd ~: to user directory
+    - open .: open the current folder in a newwindow
+    - mkdir name: new folder
+    - touch index.html
+    - open -a "Sublime Text" index.html (apply toWindow?)
+    - rename: mv index.html about.html (mv = move)
+    - rm about.html: remove file
+    - remove folder: deltree webapp (=rm -rwebapp in Mac)
+- Run a program written by Python on terminal:`python3 1.py`
+- Install pylint fot linter of Python: spell checker
+    - After installing, go to View/command palette/Python: Enable linting
+- Python PEP: 
+    - https://www.python.org/dev/peps/
+    - PEP8 is the most popular
+    - On VScode, command palette/format document/install autopep8. Run `format document` again on command palette
+    - Moreover on VScode, Code/Preferences/Setting/Search for Format/Tick on Editor: Format on Save
+    - On Pycharm, Code/Reformat Code
+- Anaconda.com: all the tools that developers need
+    - When installing, should not add to my PATH if already install Python
+    - Can install Miniconda instead
