@@ -28,3 +28,15 @@ player1 = PlayerCharacter('Cindy', 44)
 print(player1.age)   #age is an attribute
 print(player1.run()) #run is a method so it should has brackets when calling
 ```
+- See blueprint of a class: help(class)
+- Class method: can use without instantiating a class.
+- Static method:
+    - Similar to class method except for cannot access to cls (class)
+    - When we don't care about the class state
+- 4 pillars of OOP programming languages:
+    - Encapsulation: packing data and functions into attributes and methods
+    - Abstraction: hiding information and accessing what is necessary
+        - Python doesn't have true private variable(cannot be accessed and modified). It is convention to note them by adding underscore: self._name
+    - Inheritance: new objects can take property of existing objects
+    
+
