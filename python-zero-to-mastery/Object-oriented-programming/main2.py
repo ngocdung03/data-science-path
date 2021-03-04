@@ -1,4 +1,4 @@
-##### Inheritance, Polymorphism
+##### Inheritance, Polymorphism, Multiple inheritance
 
 class User:
     def __init__(self, email):
@@ -28,6 +28,16 @@ class Archer():
     def attack(self):
         print(f'attacking with arrows: arrows left- {self.num_arrows}')
 
+    def run(self):
+        print('ran really fast')
+
+class HybridBorg(Wizard, Archer):  #multiple inheritance, inherit from Wizard first then Archer
+    def __init__(self, name, power, arrows, email):
+        Archer.__init__(self, name, arrows)
+        Wizard.__init__(self, name, power, email)
+
+hb1 = HybridBorg('borgie', 50, 100,'a@b')
+print(hb1.attack())
 # introspection
 wizard1 = Wizard('Merlin', 50, 'merlin@gmail.com')
 archer1 = Archer('Robin', 100)

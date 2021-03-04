@@ -42,3 +42,11 @@ print(player1.run()) #run is a method so it should has brackets when calling
 
 - Introspection: the ability to determine the type of an object at runtime
     - Eg: print(dir(<instance>)) - display all the methods and attributes of the instance
+
+- Dunder methods:
+    - Inherited from based object
+    - To call, either .__<method>M__ or method()
+    - either __call__ or <instance>()
+    - https://docs.python.org/3/reference/datamodel.html#special-method-names
+- MRO: Method Resolution Order
+    - Depth First Search
