@@ -38,5 +38,7 @@ print(player1.run()) #run is a method so it should has brackets when calling
     - Abstraction: hiding information and accessing what is necessary
         - Python doesn't have true private variable(cannot be accessed and modified). It is convention to note them by adding underscore: self._name
     - Inheritance: new objects can take property of existing objects
-    
+    - Polymorphism: different object classes can share method names but each one does different things based on the attribute
 
+- Introspection: the ability to determine the type of an object at runtime
+    - Eg: print(dir(<instance>)) - display all the methods and attributes of the instance
