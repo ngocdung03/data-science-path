@@ -1,2 +1,2 @@
 ##### Functional programming
-- Separations of Concern
+- Separations of Concern 
