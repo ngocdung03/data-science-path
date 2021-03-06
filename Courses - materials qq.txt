@@ -1,0 +1,5 @@
+Deep learning in the life sciences: 
+https://mit6874.github.io/?fbclid=IwAR3UKATd2g0YPRplkVERtVnWCITPle9yRwMqiFA3X2VQiQKVeTVqMZjaSC8
+
+Tensorflow examples
+https://github.com/aymericdamien/TensorFlow-Examples
