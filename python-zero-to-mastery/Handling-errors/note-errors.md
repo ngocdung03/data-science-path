@@ -1,0 +1,1 @@
+- Buill-in exceptions (eg adding int and str): https://docs.python.org/3/library/exceptions.html
