@@ -20,6 +20,9 @@ moma = list(read_file)
 # contains the column names
 moma = moma[1:]
 ```
-
-
 - str.replace(oldSubString, newSubString)
+- str.title(): first letter of each word transformed to uppercase
+```
+The Cool Thing About This String Is That It Has A Combination Of Uppercase And Lowercase Letters!
+```
+- str.split(): split the string into two
