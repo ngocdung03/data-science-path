@@ -18,3 +18,19 @@ moma = list(read_file)
 moma = moma[1:]
 
 # Write your code here
+#Data analysis basics
+#artworks_clean.csv
+
+#Create a frequency table for the values in the Gender (row index 5) column.
+gender_freq = {}
+for row in moma:
+    gender = row[5]
+    if gender not in gender_freq:
+        gender_freq[gender] = 1
+    else:
+        gender_freq[gender] += 1
+
+#Loop over each key-value pair in the dictionary. Display a line of output in the format shown above summarizing each pair.
+for gender, frequency in gender_freq.items():
+    output = "There are {f:,.2f} artworks by {g} artists".format(g=gender, f=frequency)
+    print(output)
