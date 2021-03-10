@@ -74,3 +74,26 @@ class ExampleClass:
 mc = ExampleClass("Hola!")
 ```
 - Like methods, attributes are accessed using dot notation, but attributes don't have parentheses like methods do. 
+- Example for creating append() and length() method:
+```
+class MyList:
+
+    def __init__(self, initial_data):
+        self.data = initial_data
+        # Calculate the initial length
+        self.length = 0
+        for item in self.data:
+            self.length += 1
+
+    def append(self, new_item):
+        self.data = self.data + [new_item]
+        # Update the length here
+        self.length += 1
+
+        
+my_list = MyList([1, 1, 2, 3, 5])
+print(my_list.length)
+
+my_list.append(8)
+print(my_list.length)
+```
