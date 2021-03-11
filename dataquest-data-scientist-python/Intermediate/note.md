@@ -1,4 +1,4 @@
-#####Cleaning data intermediate
+##### Cleaning data intermediate
 - Import csv file as list of lists
 ```python
 # import the reader function from the csv module
@@ -97,3 +97,73 @@ print(my_list.length)
 my_list.append(8)
 print(my_list.length)
 ```
+
+##### Date and time
+- Import module 
+    - by name or alias:
+    ```
+    import csv as c
+    c.reader()
+    ```
+    - Import one or more definitions from the module by name:
+    ```
+    from csv import reader, writer
+
+    reader()
+    writer()
+    ```
+    - Import all definitions with a wildcard
+    ```python
+    from csv import *
+
+    reader()
+    writer()
+    get_dialect()
+
+    #it may not be immediately clear where a definition comes from. This can also be a problem if we use this approach with multiple modules.
+    #it's easier to accidentally overwrite an imported definition.
+    ```
+- The most useful module for working with data is the datetime module.
+- The datetime.strptime() constructor returns a datetime object defined using a special syntax system to describe date and time formats called strftime.
+```python 
+datetime.strptime("24/12/1984", "%d/%m/%Y")
+# The %d, %m, and %Y format codes specify a two-digit day, two-digit month, and four-digit year respectively, and the forward slashes between them specify the forward slashes in the original string. 
+```
+- Documentation: string parse time and string format time
+    https://strftime.org/
+    https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+- The datetime class has a number of attributes which make it easy to retrieve the various parts that make up the date stored within the object: datetime.day, datetime.month, datetime.year, datetime.hour, datetime.minute.
+- Date string format
+```python
+dt_object = dt.datetime(1984, 12, 24)
+dt_string = dt_object.strftime("%d/%m/%Y")
+print(dt_string)
+#24/12/1984
+
+# Use %B to represent the month as a word:
+dt_string = dt_object.strftime("%B %d, %Y")
+print(dt_string)
+#December 24, 1984
+
+# Use %A, %I, %M, and %p to represent the day of the week, the hour of the day, the minute of the hour, and a.m./p.m.:
+dt_string = dt_object.strftime("%A %B %d at %I:%M %p")
+print(dt_string)
+#Monday December 24 at 12:00 AM
+```
+- Apart from having no strptime constructor, time objects behave similarly to datetime objects: attributes like time.hour and time.second; time.strftime() method, which you can use to create a formatted string representation of the object.
+- When we use the - operator with two date objects, the result is the time difference between the two datetime objects. The resultant object is a datetime.timedelta object. 
+- we can also instantiate a timedelta class directly: `datetime.timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)`
+- We can also use timedelta objects to add or subtract time from datetime objects.
+```python
+d1 = dt.date(1963, 2, 21)
+d1_plus_1wk = d1 + dt.timedelta(weeks=1)
+print(d1_plus_1wk)
+```
+
+
+
+
+
+
+
+
