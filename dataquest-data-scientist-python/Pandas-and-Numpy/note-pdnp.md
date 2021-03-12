@@ -29,3 +29,26 @@ ndarray[location_of_values] = new_value`
 ```
 array[array[:, column_for_comparison] == value_for_comparison, column_for_assignment] = new_value
 ```
+
+##### Introduction to Pandas
+- Advantages:
+    - Axis values can have string labels, not just numeric ones.
+    - Dataframes can contain columns with multiple data types: including integer, float, and string.
+- DataFrame.dtypes attribute (similar to NumPy's ndarray.dtype attribute): return information about the types of each column
+- object type: used for columns that have data that doesn't fit into any other dtype
+- DataFrame.info() method: an overview of all the dtypes used in dataframe, along with its shape and other information
+- Select data using labels: `df.loc[row_label, column_label]`
+- Series is the pandas type for one-dimensional objects
+-  Instead of `df.loc[:,["col1","col2"]]`, you can also use `df[["col1", "col2"]]` to select specific columns.
+- Slice columns with labels: `f500_selection.loc[:, "rank":"profits"]  #Inclusive!`
+- Similar for selecting row: `
+```
+single_row = f500_selection.loc["Sinopec Group"]
+list_rows = f500_selection.loc[["Toyota Motor", "Walmart"]]
+slice_rows = f500_selection["State Grid":"Toyota Motor"]
+```
+- single_col = df["D"]
+single_row = df.loc["v"]
+mult_cols = df[["A", "C", "D"]]
+mult_rows = df.loc[["v", "w", "x"]]
+
