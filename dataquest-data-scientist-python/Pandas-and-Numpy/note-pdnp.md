@@ -51,4 +51,10 @@ slice_rows = f500_selection["State Grid":"Toyota Motor"]
 single_row = df.loc["v"]
 mult_cols = df[["A", "C", "D"]]
 mult_rows = df.loc[["v", "w", "x"]]
+- Series.value_counts() method: displays each unique non-null value in a column and their counts in order.
+- Select items from serires:
+    - Single item: s.loc["item"] or s["item"]
+    - List of items: s.loc[["item1", "item7"]] or s[["item1", "item7"]]
+    - Slice of items: s.loc["item2":"item4"] or s["item2":"item4"]
+    
 

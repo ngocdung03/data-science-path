@@ -26,3 +26,14 @@ toyota = f500.loc['Toyota Motor']
 drink_companies = f500.loc[['Anheuser-Busch InBev', 'Coca-Cola', 'Heineken Holding']]
 middle_companies = f500['Tata Motors':'Nationwide']
 middle_companies = f500.loc['Tata Motors':'Nationwide', 'rank':'country']
+
+# Using .value_count() to make a frequency table
+countries = f500_sel["country"]
+country_counts = countries.value_counts()
+
+# Select items from series
+countries = f500['country']
+countries_counts = countries.value_counts()
+
+india = countries_counts["India"]
+north_america = countries_counts[["USA", "Canada", "Mexico"]]
