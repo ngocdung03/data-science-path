@@ -31,6 +31,7 @@ array[array[:, column_for_comparison] == value_for_comparison, column_for_assign
 ```
 
 ##### Introduction to Pandas
+- Documentation: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.max.html
 - Advantages:
     - Axis values can have string labels, not just numeric ones.
     - Dataframes can contain columns with multiple data types: including integer, float, and string.
@@ -52,9 +53,24 @@ single_row = df.loc["v"]
 mult_cols = df[["A", "C", "D"]]
 mult_rows = df.loc[["v", "w", "x"]]
 - Series.value_counts() method: displays each unique non-null value in a column and their counts in order.
-- Select items from serires:
+- Select items from series:
     - Single item: s.loc["item"] or s["item"]
     - List of items: s.loc[["item1", "item7"]] or s[["item1", "item7"]]
     - Slice of items: s.loc["item2":"item4"] or s["item2":"item4"]
-    
+- [Summary of label selection.jpg]
 
+##### Pandas fundamental
+- Series.describe(): tells us how many non-null values are contained in the series, along with the mean, minimum, maximum, and other statistics we'll learn about later in this path.
+    - Documentation: https://app.dataquest.io/m/381/exploring-data-with-pandas%3A-fundamentals/7/dataframe-describe-method
+    - By default return statistics for only numeric columns
+    - Getting just the object columns, include=['O'] parameter: `print(f500.describe(include=['O']))`
+    - Series.describe() returns a series object; the DataFrame.describe() returns a dataframe object.
+- Pandas dataframe methods also accept the strings "index" and "columns" for the axis parameter:
+    - Calculates result for each column: DataFrame.method(axis="index")
+    - Calculates results for each row: DataFrame.method(axis="column")
+- Boolean indexing: didn't use loc[]  because boolean arrays use the same shortcut as slices to select along the index axis.
+- Where you try and assign a NaN value to an integer column, pandas will silently convert that column to a float dtype: https://pandas.pydata.org/pandas-docs/stable/user_guide/gotchas.html
+
+##### Pandas Intermediate
+- Pandas.read_csv(): https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
+- 
