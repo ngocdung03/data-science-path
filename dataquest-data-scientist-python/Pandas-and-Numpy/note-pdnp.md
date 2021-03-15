@@ -73,4 +73,33 @@ mult_rows = df.loc[["v", "w", "x"]]
 
 ##### Pandas Intermediate
 - Pandas.read_csv(): https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html
-- 
+-
+``` 
+f500 = pd.read_csv("f500.csv", index_col=0)  #specify the first column as the row labels
+f500.index.name = None  #don't inlcude the name for the index axis
+```
+- .loc and .iloc:
+    - loc: label based selection
+    - iloc: integer position based selection
+- Positional slicing:
+```
+second_to_sixth_rows = f500[1:5]  
+```
+    - With loc[], the ending slice is included.
+    - With iloc[], the ending slice is not included.
+- [Index slicing iloc.jpg]
+- Series.isnull() method and Series.notnull() method: select either rows that contain null (or NaN) values or rows that do not contain null values for a certain column: `rev_is_null = f500["revenue_change"].isnull()`
+- Concatenate series/dataframes by mutual index labels: `food["alt_name"] = alt_name`
+- Combining boolean indexing: 
+```
+big_rev_neg_profit = f500[(f500["revenues"] > 100000) & (f500["profits"] < 0)]
+# our boolean operation will fail without parentheses
+```
+- Pandas `~a` (Python equivalent `not a`): True if a is False
+- DataFrame.sort_values(): 
+    - https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.sort_values.html
+    - `sorted_rows = selected_rows.sort_values("employees", ascending=False)`
+- Aggregation: apply a statistical operation to groups of our data. 
+
+
+
