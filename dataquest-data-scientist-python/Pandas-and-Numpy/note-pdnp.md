@@ -101,5 +101,48 @@ big_rev_neg_profit = f500[(f500["revenues"] > 100000) & (f500["profits"] < 0)]
     - `sorted_rows = selected_rows.sort_values("employees", ascending=False)`
 - Aggregation: apply a statistical operation to groups of our data. 
 
-
-
+##### Data cleaning basics
+- Python string methods: https://docs.python.org/3/library/stdtypes.html#string-methods
+- [steps-convert-text-to-numeric.jpg]
+- Pandas vectorized string methods: https://pandas.pydata.org/pandas-docs/stable/user_guide/text.html#method-summary
+- Series.str accessor: 
+    - access them by adding str between the series name and the method name: `Series.str.method_name()`
+    - https://pandas.pydata.org/pandas-docs/stable/reference/index.html
+    - Series.str.replace() is a vectorized version of Python str.replace() method: `laptops["screen_size"].str.replace('"','')`
+- Series.astype() method: convert type https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.astype.html
+- Rename column: https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.rename.html
+```
+laptops.rename({"screen_size": "screen_size_inches"}, axis=1, inplace=True)  
+#specify the axis=1 - column axis
+#inplace=True: assign the result back to the dataframe
+```
+- Just like with lists and ndarrays, we can use bracket notation to access the elements in each list in the series. With series, however, we use the str accessor followed by [] (brackets): `print(laptops["gpu"].head().str.split().str[0])`
+- Series.map() method:
+    - Change multiple values in a column
+    - The most common way to use it is with a dictionary
+    ```
+    corrections = {
+    "pair": "pear",
+    "oranje": "orange",
+    "bananna": "banana"
+    }
+    s = s.map(corrections)
+    # if a value from your series doesn't exist as a key in your dictionary, it will convert that value to NaN
+    ```
+- There are a few options for handling missing values:
+    - Remove any rows that have missing values `DataFrame.dropna()`. Often used to prepare data for machine learning algorithms, which are unable to be used with data that includes null values.
+    - Remove any columns that have missing values.
+    - Fill the missing values with some other value.
+        - Firstly explore all the values in the column `print(laptops["os_version"].value_counts(dropna=False))`
+        - Let's also explore the os column, since it's is closely related to the os_version column.
+        ```
+        os_with_null_v = laptops.loc[laptops["os_version"].isnull(),"os"]
+        print(os_with_null_v.value_counts())
+        ```
+        - Use knowledge to fill the missing values. Otherwise leave them as is: `laptops.loc[laptops["os"] == "macOS", "os_version"] = "X"`
+    - Leave the missing values as is.
+- Save a new CSV file when finish cleaning: 
+```
+df.to_csv('filename.csv', index=False)   
+# By default, pandas will save the index labels as a column in the CSV file. Our dataset has integer labels that don't contain any data, so we don't need to save the index.
+```
