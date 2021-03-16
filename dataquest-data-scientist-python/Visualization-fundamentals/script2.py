@@ -50,3 +50,22 @@ plt.ylabel('Humidity')
 plt.show()
 
 ## Bar plots, histograms, and distributions
+working_days = ['Non-Working Day', 'Working Day']
+registered_avg = [2959, 3978]
+
+plt.bar(working_days, registered_avg)
+plt.show()
+
+# Plot 2: histogram by weekdays
+weekday_averages = bike_sharing.groupby('weekday').mean()[['casual', 'registered']].reset_index() 
+plt.bar(weekday_averages['weekday'], weekday_averages['registered'])
+plt.xticks(ticks=[0, 1, 2, 3, 4, 5, 6],
+          labels=['Sunday', 'Monday', 'Tuesday', 'Wednesday',
+                 'Thursday', 'Friday', 'Saturday'],
+          rotation=30)
+plt.show()
+
+# Generate a grouped frequency table with 10 intervals, sorted ascending
+registered_freq = bike_sharing['registered'].value_counts(bins = 10).sort_index()
+
+casual_freq = bike_sharing['casual'].value_counts(bins = 10).sort_index()

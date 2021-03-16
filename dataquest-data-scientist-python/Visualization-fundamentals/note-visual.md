@@ -25,3 +25,16 @@ plt.show()
 - Series.corr() method: calculate the Pearson's r between two variables: `bike_sharing['temp'].corr(bike_sharing['cnt'])`
 - DataFrame.corr() returns a DataFrame (correlation table): `bike_sharing.corr()[['cnt', 'casual', 'registered']]`
 
+##### Bar plots, histograms, and distributions
+- plt.bar(x, y)
+- plt.barh(): horizontal bar plot
+- Bar plots work well when generating the frequency tables for categorical columns. For numerical columns, we need to use a histogram.
+- Group the frequency table into ten equal intervals by using the bins=10 argument: `bike_sharing['cnt'].value_counts(bins=10)`
+- plt.hist(x): histogram
+
+##### Pandas visualization and grid charts
+- About the dataset: https://archive.ics.uci.edu/ml/datasets/Behavior+of+the+urban+traffic+of+the+city+of+Sao+Paulo+in+Brazil
+- Series.plot.hist(): a quicker way to generate histogram: `traffic['Slowness in traffic (%)'].plot.hist()`
+- Series.plot.line(): generates a line plot.
+- Calculate sums of columnsz: DataFrame.sum()
+
