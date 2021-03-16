@@ -20,4 +20,8 @@ plt.legend()
 plt.show()
 #When we use plt.plot() the first time, Matplotlib creates a line graph. When we use plt.plot() again, Matplotlib creates another line graph that shares the same x- and y-axis as the first graph. If we want Matplotlib to draw the second line graph separately, we need to close the first graph with the plt.show() function.
 ```
-- 
+##### Scatter plots and correlations
+- plt.scatter(x,y)
+- Series.corr() method: calculate the Pearson's r between two variables: `bike_sharing['temp'].corr(bike_sharing['cnt'])`
+- DataFrame.corr() returns a DataFrame (correlation table): `bike_sharing.corr()[['cnt', 'casual', 'registered']]`
+
