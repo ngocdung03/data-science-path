@@ -93,6 +93,7 @@ for day in days:
 plt.legend()
 plt.show()
 
+## Relational plots and multiple variables
 
 
 

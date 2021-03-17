@@ -42,5 +42,13 @@ plt.show()
     - plt.subplot(nrows, ncols, index)
     - When we want to add another plot, we add another plt.subplot() function
     - it only takes positional arguments. If we use keyword arguments, we'll get an error — plt.subplot(nrows=3, ncols=2, index=1)
-    - plt.figure(figsize=(width, height)).
-
+    - plt.figure(figsize=(width, height))
+    
+##### Relational plots and multiple variables
+- Seaborn enables us to easily show more than two variables on a graph
+- Call the sns.relplot() function to generate the plot.
+    - We pass in the housing DataFrame to the data parameter.
+    - We pass in the column names as strings to parameters x and y.
+    - By default, the sns.relplot() function generates a scatter plot.
+    - To switch to Seaborn defaults,  call the sns.set_theme() before generating the plot
+- Matplotlib color palette: https://matplotlib.org/stable/tutorials/colors/colormaps.html
