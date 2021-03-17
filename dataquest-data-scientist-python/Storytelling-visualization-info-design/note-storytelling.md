@@ -72,3 +72,6 @@ ax.tick_params(top=False, left=False)
     - c parameter to change the color
     - alpha parameter: transparency
     - `ax.axvline(x=150000, ymin=0.045, c='grey', alpha=0.5)`
+
+##### Storytelling data visualization
+- To create a data story, we need to wrap those numerical facts into events that show change.
