@@ -37,4 +37,10 @@ plt.show()
 - Series.plot.hist(): a quicker way to generate histogram: `traffic['Slowness in traffic (%)'].plot.hist()`
 - Series.plot.line(): generates a line plot.
 - Calculate sums of columnsz: DataFrame.sum()
+- A grid chart is a collection of similar graphs that usually share the same x- and y-axis range. The main purpose of a grid chart is to ease comparison.
+    - First creating the larger figure where we will plot all the graphs: plt.figure()
+    - plt.subplot(nrows, ncols, index)
+    - When we want to add another plot, we add another plt.subplot() function
+    - it only takes positional arguments. If we use keyword arguments, we'll get an error — plt.subplot(nrows=3, ncols=2, index=1)
+    - plt.figure(figsize=(width, height)).
 
