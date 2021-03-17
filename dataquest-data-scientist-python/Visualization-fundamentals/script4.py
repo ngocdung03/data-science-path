@@ -13,8 +13,10 @@ housing.info()
 sns.set_theme()
 sns.relplot(data=housing, x='Gr Liv Area', y='SalePrice',
            hue='Overall Qual', palette='RdYlGn',
-           size='Garage Area', sizes=(1,300))   #The min/max value in the range Tuple maps to the min/max value in the variable.
+           size='Garage Area', sizes=(1,300),   #The min/max value in the range Tuple maps to the min/max value in the variable.
            #size='Rooms', sizes=[200,50])   #To control the sizes for a categorical variable, we need to use a list or a dict. Instead of specifying the range, we need to specify the sizes for each unique value in the variable.
-
+            style='Rooms', markers=['*','v'],   #Marker shape for categorical variable
+            col='Year')       #Separated graphs by year
 plt.show()
+
 

@@ -52,3 +52,5 @@ plt.show()
     - By default, the sns.relplot() function generates a scatter plot.
     - To switch to Seaborn defaults,  call the sns.set_theme() before generating the plot
 - Matplotlib color palette: https://matplotlib.org/stable/tutorials/colors/colormaps.html
+- Change marker shape: https://matplotlib.org/3.3.3/api/markers_api.html
+- The graph we built is essentially a scatter plot. However, because it shows the relationships between so many variables, we call it a relational plot.
