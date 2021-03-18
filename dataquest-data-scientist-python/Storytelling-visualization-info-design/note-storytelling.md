@@ -84,3 +84,10 @@ ax.tick_params(top=False, left=False)
     - Enclosure: When we see a set of distinct elements enclosed inside a visual form, we perceive them as part of the same group
     - Connection: When we see distinct objects connected by some kind of a visual form (usually a line), we perceive them as part of the same group. Typically stronger than proximity and similarity and equal to enslosure
     - Our brains typically become aware of these different objects before we consciously direct our attention toward them. Because they come before conscious attention, we call them *pre-attentive*
+
+##### Matplotlib styles: FiveThirtyEight case study
+- Matplotlib's pre-defined styles: `import matplotlib.style as style`
+- `style.available`: see all the available styles 
+- we must use the style.use() function before we create the graph — before calling the plt.plot() function.
+- To get back to the default settings, we need to use style.use('default')
+- If you want to switch between different styles, use style.use('default') between each change — some of the styles can interfere with one another.
