@@ -75,3 +75,4 @@ ax.tick_params(top=False, left=False)
 
 ##### Storytelling data visualization
 - To create a data story, we need to wrap those numerical facts into events that show change.
+- Axes.axhline(): draw a horizontal line. y parameter specifies the y-coordinate of the horizontal line.
