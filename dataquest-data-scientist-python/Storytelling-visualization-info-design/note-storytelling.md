@@ -76,3 +76,11 @@ ax.tick_params(top=False, left=False)
 ##### Storytelling data visualization
 - To create a data story, we need to wrap those numerical facts into events that show change.
 - Axes.axhline(): draw a horizontal line. y parameter specifies the y-coordinate of the horizontal line.
+
+##### Gestalt principles and pre-attentive attributes
+- Gestalt principles: predict what sort of patterns people see in our data visualizations
+    - Proximity: When we see distinct objects close to each other, we perceive them as a group
+    - Similarity: our perception groups together individual elements that are similar to one another
+    - Enclosure: When we see a set of distinct elements enclosed inside a visual form, we perceive them as part of the same group
+    - Connection: When we see distinct objects connected by some kind of a visual form (usually a line), we perceive them as part of the same group. Typically stronger than proximity and similarity and equal to enslosure
+    - Our brains typically become aware of these different objects before we consciously direct our attention toward them. Because they come before conscious attention, we call them *pre-attentive*
