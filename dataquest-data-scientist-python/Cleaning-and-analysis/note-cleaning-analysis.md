@@ -21,3 +21,5 @@ happiness2015.pivot_table(values='Happiness Score', index='Region', aggfunc=np.m
     - much more common to use inner and left joins for database-style joins
     - Inner join by index: `pd.merge(left=four_2015, right=three_2016, left_index=True, right_index=True, suffixes=('_2015','_2016'))`
 - [pd.concat-vs-pd.merge.jpg] 
+
+##### Transforming data with pandas

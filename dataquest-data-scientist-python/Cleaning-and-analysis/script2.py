@@ -23,3 +23,8 @@ merge_index = pd.merge(left = four_2015,right = three_2016, left_index = True, r
 merge_index_left = pd.merge(left = four_2015,right = three_2016, left_index = True, right_index = True, suffixes = ('_2015','_2016'), how='left')
 
 # Comparing world happiness from 2015 to 2017
+happiness2017.rename(columns={'Happiness.Score': 'Happiness Score'}, inplace=True)
+combined = pd.concat([happiness2015, happiness2016, happiness2017])
+
+pivot_table_combined = combined.pivot_table(values='Happiness Score', index='Year', aggfunc=np.mean)
+pivot_table_combined.plot(kind='barh', title='Mean Happiness Scores by Year', xlim=(0,10))
