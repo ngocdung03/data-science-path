@@ -23,3 +23,26 @@ happiness2015.pivot_table(values='Happiness Score', index='Region', aggfunc=np.m
 - [pd.concat-vs-pd.merge.jpg] 
 
 ##### Transforming data with pandas
+- Series.map()
+- Series.apply()
+- Only use the Series.apply() method to apply a function with additional arguments element-wise. Series.map() will return errors
+- DataFrame.applymap(): apply same function to multiple columns
+- We used the df.apply() method to transform multiple columns. This is only possible because the parameter (eg. pd.value_counts) function operates on a series. If we tried to use the df.apply() method to apply a function that works element-wise to multiple columns, we'd get an error:
+```
+def label(element):
+    if element > 1:
+        return 'High'
+    else:
+        return 'Low'
+happiness2015[factors].apply(label)  #Error
+```
+- In general, we should only use the apply() method when a vectorized function does not exist
+- pd.melt() function: 
+```
+pd.melt(df, id_vars=[col1, col2], value_vars=[col3,col4])
+#col1, col2: names of the columns that should remain the same in the result
+#col3, col4: names of the columns that should be changed to rows in the result
+```
+    - Data is in a format that makes it easier to aggregate. We refer to data in this format as *tidy* data.
+- df.pivot(): "un-melt" the data
+    -  !!Different from df.pivot_table() method 
