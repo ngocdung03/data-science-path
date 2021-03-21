@@ -93,6 +93,11 @@ missing = happiness2015['Happiness Score'].isnull()
 happiness2015[missing]
 ```
 - when working with bigger data sets, it's easier to get a summary of the missing values: `happiness2015.isnull().sum()`
+- Determine if the data is really missing or if it's the result of some kind of error:
+    - Check for errors in data cleaning/transformation.
+    - Use data from additional sources to fill missing values.
+    - Drop row/column.
+    - Fill missing values with reasonable estimates computed from the available data.
 
 
 
