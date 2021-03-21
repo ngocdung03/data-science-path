@@ -85,6 +85,14 @@ pd.melt(df, id_vars=[col1, col2], value_vars=[col3,col4])
     - User input error
     - Data storage or conversion issues
     - Purposely indicate that data is unavailable.
+- pandas will not automatically identify values such as n/a, -, or -- as NaN or None, but they may also indicate data is missing.
+- how to use the pd.read_csv() function to read those values in as NaN: https://stackoverflow.com/questions/40011531/in-pandas-when-using-read-csv-how-to-assign-a-nan-to-a-value-thats-not-the#answer-40011736
+- Once we ensure that all missing values were read in correctly, we can use the Series.isnull() method to identify rows with missing values:
+```py
+missing = happiness2015['Happiness Score'].isnull()
+happiness2015[missing]
+```
+- when working with bigger data sets, it's easier to get a summary of the missing values: `happiness2015.isnull().sum()`
 
 
 
