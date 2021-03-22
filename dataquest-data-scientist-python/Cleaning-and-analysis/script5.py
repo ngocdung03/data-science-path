@@ -32,3 +32,31 @@ missing = regions_2017.isnull().sum()
 # 2. Use data from additional sources to fill missing values.
 # Since the regions are fixed values - the region a country was assigned to in 2015 or 2016 won't change - we should be able to assign the 2015 or 2016 region to the 2017 row.
 regions = pd.read_csv('regions.csv')
+combined = pd.merge(left=combined, right=regions, on='COUNTRY', how='left')
+combined = combined.drop('REGION_x', axis = 1)
+missing = combined.isnull().sum()
+
+# Checking for duplicates
+combined['COUNTRY'] = combined['COUNTRY'].str.upper()
+dups = combined.duplicated(['COUNTRY', 'YEAR'])
+combined[dups]
+combined = combined.drop_duplicates(['COUNTRY', 'YEAR'])
+
+# 3. Dropping rows/columns with missing data:
+columns_to_drop = ['LOWER CONFIDENCE INTERVAL', 'STANDARD ERROR', 'UPPER CONFIDENCE INTERVAL', 'WHISKER HIGH', 'WHISKER LOW']
+combined = combined.drop(columns_to_drop, axis=1)
+missing = combined.isnull().sum()
+# drop all columns in combined with 159 or less non null values.
+combined = combined.dropna(thresh=159, axis=1)
+missing = combined.isnull().sum()
+
+# Replace the missing happiness scores with the mean.
+happiness_mean = combined['HAPPINESS SCORE'].mean()
+print(happiness_mean)
+combined['HAPPINESS SCORE UPDATED'] = combined['HAPPINESS SCORE'].fillna(happiness_mean)
+print(combined['HAPPINESS SCORE UPDATED'].mean())
+
+# The mean for the whole world wouldn't be a good estimate for Sub-Saharan Africa region, where most of missing values arise from.
+# Maybe it's better to drop the rows with missing values
+combined = combined.dropna()
+missing = combined.isnull().sum()

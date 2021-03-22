@@ -97,9 +97,27 @@ happiness2015[missing]
     - Check for errors in data cleaning/transformation.
     - Use data from additional sources to fill missing values.
     - Drop row/column.
-    - Fill missing values with reasonable estimates computed from the available data.
-
-
+    - Fill missing values with reasonable estimates computed from the available data (Imputation): A constant value, mean of the column, median of the column, or mode of the column.
+- DataFrame.duplicated(): check for duplicate values: Check if there are rows with both same country and year: `dups = combined.duplicated(['COUNTRY', 'YEAR'])`
+- df.drop_duplicates() drop the duplicate rows. It will only keep the first duplicate row. To keep the last duplicate row, set the keep parameter to 'last'. Sometimes, this will mean sorting the dataframe before dropping the duplicate rows.
+- When deciding if you should drop a row or column, it's better to also ask the following questions:
+    1. Is the missing data needed to accomplish our end goal?
+    2. How will removing or replacing the missing values affect our analysis?
+        - *What percentage of the data is missing?* the lower the percentage of missing values, the less likely dropping them will significantly impact the analysis.
+        - *Will dropping missing values cause us to lose valuable information in other columns?* if the data is missing in almost every column, dropping them won't cause us to lose valuable information in other columns. 
+        - Can we identify any patterns in the missing data?
+- DataFrame.dropna(): delete rows with missing values, axis=1: delete columns
+    - `thresh` parameter to only drop columns if they contain below a certain number of non-null values.
+- To confirm the number of values that are NOT missing, we can use the DataFrame.notnull()method: `combined.notnull().sum().sort_values`
+-  Data cleaning workflow:
+    - Set a goal for the project.
+    - Researched and tried to understand the data.
+    - Determined what data was needed to complete     - our analysis.
+    - Added columns.
+    - Cleaned specific data types.
+    - Combined data sets.
+    - Removed duplicate values.
+    - Handled the missing values.
 
 
 
