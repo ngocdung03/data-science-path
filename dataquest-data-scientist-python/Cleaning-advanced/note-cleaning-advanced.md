@@ -79,3 +79,83 @@ repl: text to substitute the match
 - Named capture groups ?P<name>: `(?P<date>.+)\s(?P<time>.+)`
 
 ##### List Comprehensions and Lambda Functions
+- JavaScript Object Notation (JSON): From a Python perspective, can be thought as a collection of Python objects nested inside each other.
+- The Python json module contains a number of functions to make working with JSON objects easier. We can use the json.loads() method to convert JSON data contained in a string to the equivalent set of Python objects:
+```py
+json_string = """
+[
+  {
+    "name": "Sabine",
+    "age": 36,
+    "favorite_foods": ["Pumpkin", "Oatmeal"]
+  },
+  {
+    "name": "Zoe",
+    "age": 40,
+    "favorite_foods": ["Chicken", "Pizza", "Chocolate"]
+  }
+]
+"""
+import json
+json_obj = json.loads(json_string)
+print(type(json_obj))
+# The order of the keys in the dictionary have changed. This is because (prior to version 3.6) Python dictionaries don't have fixed order.
+```
+- Application programming interface (API): can be used to send and transmit data between different computer systems.
+- The json.loads() function: used for loading JSON data from a string ("loads" is short for "load string"), whereas the json.load() function is used to load from a file object
+- json.dumps() function ("dump string") which does the opposite of the json.loads() function — it takes a JSON object and returns a string version of it
+- del statement: delete a key from a dictionary 
+```py
+d = {'a': 1, 'b': 2, 'c': 3}
+del d['a']
+```
+- *List comprehension* provides a concise way of creating/transforming/reducing lists in a single line of code.
+```py
+ints = [1,2,3]
+plus_one = []
+for i in ints:
+    if i > 2:
+        plus_one.append(i + 1)
+# List comprehension
+plus_one = [i+1 for i in ints if i>2]
+```
+- jprint(json_obj)
+- The parentheses are what tells Python to execute the function, so if we omit the parentheses we can treat a function like a *variable*
+    - Eg. assign a function to a new variable name
+    ```
+    greet_2 = greet
+    greet_2()
+    ```
+- Run a function inside another function by passing it as an argument:
+```py
+def run_func(func):
+    print("RUNNING FUNCTION: {}".format(func))
+    return func()
+run_func(greet)
+# RUNNING FUNCTION: function greet at 0x12a64c400
+#'hello'
+
+# The format() method formats the specified value(s) and insert them inside the string's placeholder.
+```
+- There is a way we can actually tell functions like min(), max(), and sorted() how to sort complex objects like dictionaries and lists of lists: using the optional **key argument**. The official Python documentation describes it works:
+    - The key argument specifies a one-argument ordering function like that used for list.sort(). Key specifies a function of one argument that is used to extract a comparison key from each list element. The key corresponding to each item in the list is calculated once and then used for the entire sorting process.
+```py
+# Find dict with min age in json dataset
+def get_age(json_dict):
+    return json_dict['age']
+​
+youngest = min(json_obj, key=get_age)
+jprint(youngest)
+```
+- *Lambda functions* special syntax to create temporary functions 
+    - If a function is particularly complex, it may be a better choice to define a regular function rather than create a lambda
+```py
+def add(x, y):
+    return x + y
+# Lambda function
+add = lambda x, y: x + y
+```
+- Apply lambda function as a key argument for sorted(): `sorted(hn_clean, key=lambda d: d['age'])`
+- Pandas has the pandas.read_json() function, which is designed to read JSON from either a file or a JSON string
+    - Should prepare data as a list of dictionaries so pandas is easily able to convert to a dataframe.
+- We can use the pandas.DataFrame() constructor and pass the list of dictionaries directly to it to convert the JSON to a dataframe:
