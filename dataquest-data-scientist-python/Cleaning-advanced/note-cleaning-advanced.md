@@ -58,4 +58,24 @@ def first_10_matches(pattern):
     ```
 
 ##### Advanced regular expressions
+- *Lookarounds* let us define a character or sequence of characters that either must or must not come before or after our regex match.
+    - [Lookaround.jpg]
+    - can include any other regular expression component, eg. cases that are followed by exactly five characters: `run_test_cases(r"Green(?=.{5})")`
+-  We'll use the re module rather than pandas since it tells us the exact text that matches, which will help us understand how the lookaround is working
+- Sometimes programming languages won't implement support for all lookarounds (notably, lookbehinds are not in the official JavaScript specification). As an example, to get full support in the RegExr tool, you'll need to set it to use the PCRE regex engine.
+- *Backreferences*: we don't know ahead of time what letters might be repeated, we need a way to specify a capture group and then to repeat it: 
+```py
+(Hello)(Goodbye)\2\1
+# \2 refers to the contents of group 2
+# Will match 'HelloGoodbyeGoodbyeHello'
+```
+    - same two word characters in a row: (\w)\1
+- re.sub() function: replace substrings, similar to str.replace() method:
+```py
+re.sub(pattern, repl, string, flags=0)
+repl: text to substitute the match
+```
+- Multiple capture groups: `(.+)\s(.+)`
+- Named capture groups ?P<name>: `(?P<date>.+)\s(?P<time>.+)`
 
+##### List Comprehensions and Lambda Functions

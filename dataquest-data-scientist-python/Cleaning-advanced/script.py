@@ -89,3 +89,59 @@ py_versions_freq = dict(py_versions.value_counts())
 pattern = r"\b[Cc]\b[^.+]"
 first_ten = first_10_matches(pattern)
 
+# Keep excluding matches that are followed by . or +, but still match cases where "C" falls at the end of the sentence. Exclude matches that have the word 'Series' immediately preceding them.
+pattern = r'(?<!Series\s)\b[Cc]\b(?![.+]|\.$)'       #?why |\.$
+c_mentions = titles.str.contains(pattern).sum()
+
+# Match cases of repeated words
+# define a word as a series of one or more word characters preceded and followed by a boundary anchor
+# define repeated words as the same word repeated twice, separated by a single whitespace character.
+pattern = r'\b(\w+)\s\1\b'                  #wrong r'(\b\w+\b)\s\1'
+repeated_words = titles[titles.str.contains(pattern)]
+
+# Replace substring, ignore case 
+email_variations = pd.Series(['email', 'Email', 'e Mail',
+                        'e mail', 'E-mail', 'e-mail',
+                        'eMail', 'E-Mail', 'EMAIL'])
+#wrong r'\be[-?\s?]mail\b'
+pattern = r'\be[-\s]?mail'     # ?why not r'\be[-\s]?mail\b'      
+email_uniform = email_variations.str.replace(pattern, "email", flags=re.I)
+titles_clean = titles.str.replace(pattern, "email", flags=re.I)
+
+# Extract URL
+test_urls = pd.Series([
+ 'https://www.amazon.com/Technology-Ventures-Enterprise-Thomas-Byers/dp/0073523429',
+ 'http://www.interactivedynamicvideo.com/',
+ 'http://www.nytimes.com/2007/11/07/movies/07stein.html?_r=0',
+ 'http://evonomics.com/advertising-cannot-maintain-internet-heres-solution/',
+ 'HTTPS://github.com/keppel/pinn',
+ 'Http://phys.org/news/2015-09-scale-solar-youve.html',
+ 'https://iot.seeed.cc',
+ 'http://www.bfilipek.com/2016/04/custom-deleters-for-c-smart-pointers.html',
+ 'http://beta.crowdfireapp.com/?beta=agnipath',
+ 'https://www.valid.ly?param',
+ 'http://css-cursor.techstream.org'
+])
+pattern = r'(?<=://)([\w\.\-]*)'       #wrong r'(?<=://)(.*)(?=[/?\b])'
+test_urls_clean = test_urls.str.extract(pattern, expand=False)
+domains = hn['url'].str.extract(pattern, expand=False)
+top_domains = domains.value_counts().head(5)
+### Solution ###
+pattern = r"https?://([\w\-\.]+)"
+
+test_urls_clean = test_urls.str.extract(pattern, flags=re.I, expand=False)
+domains = hn['url'].str.extract(pattern, flags=re.I, expand=False)
+top_domains = domains.value_counts().head(5)
+######
+
+# Multiple capture groups
+# `test_urls` is available from the previous screen
+# wrong r'(.+)://([\w\.\-]+)[/\b](.*)' 
+# why wrong?  pattern = r'(.+)://([\w\.\-]+)/?(.*)'              
+pattern = r'(https?)://([\w\.\-]+)/?(.*)'
+test_url_parts = test_urls.str.extract(pattern, flags = re.I)
+url_parts = hn['url'].str.extract(pattern, flags = re.I)
+
+# Named capture groups.
+pattern = r"(?P<protocol>https?)://(?P<domain>[\w\.\-]+)/?(?P<path>.*)"
+url_parts = hn['url'].str.extract(pattern, flags=re.I)
