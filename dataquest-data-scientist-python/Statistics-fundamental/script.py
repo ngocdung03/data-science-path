@@ -83,3 +83,17 @@ sampling_error_height = wnba['Height'].mean() - sample['Height'].mean()
 sampling_error_age = wnba['Age'].mean() - sample['Age'].mean()
 sampling_error_BMI = wnba['BMI'].mean() - sample['BMI'].mean()
 sampling_error_points = wnba['PTS'].mean() - sample['PTS'].mean()
+
+## Variables in statistics
+variables = {'Name': 'qualitative', 'Team': 'qualitative', 'Pos': 'qualitative', 'Height': 'quantitative', 'BMI': 'quantitative',
+             'Birth_Place': 'qualitative', 'Birthdate': 'quantitative', 'Age': 'quantitative', 'College': 'qualitative', 'Experience': 'quantitative',
+             'Games Played': 'quantitative', 'MIN': 'quantitative', 'FGM': 'quantitative', 'FGA': 'quantitative',
+             '3PA': 'quantitative', 'FTM': 'quantitative', 'FTA': 'quantitative', 'FT%': 'quantitative', 'OREB': 'quantitative', 'DREB': 'quantitative',
+             'REB': 'quantitative', 'AST': 'quantitative', 'PTS': 'quantitative'}
+# Nominal variables
+#wnba.columns
+nominal_scale = sorted(['Name', 'Team', 'Pos', 'Birth_Place', 'College'])  # sort() changes the list directly and doesn't return any value, while sorted() doesn't change the list and returns the sorted list.
+interval = sorted(['Birthdate', 'Weight_deviation'])
+ratio = sorted(['Height', 'Weight', 'BMI', 'Age', 'Experience', 'Games Played', 'MIN', 'FGM', 'FGA', 'FG%', '15:00', '3PA', '3P%', 'FTM', 'FTA', 'FT%', 'OREB',
+       'DREB', 'REB', 'AST', 'STL', 'BLK', 'TO', 'PTS', 'DD2', 'TD3'])
+       

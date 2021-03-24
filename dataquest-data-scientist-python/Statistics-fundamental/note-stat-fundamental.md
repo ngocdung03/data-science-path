@@ -13,3 +13,8 @@
 - Sometimes data is scattered across different locations. One way is to list all the data sources you can find, and then randomly pick only a few of them to collect data from. Then you can sample individually each of the sources you've randomly picked. This sampling method is called **cluster sampling**.
     - Eg: Sample 4 clusters randomly: `pd.Series(wnba['Team'].unique()).sample(4, random_state = 0))`
 
+##### Variables in statistics
+- The system of rules that define how each variable is measured is called scale of measurement or, less often, level of measurement.
+- Quantitative variables: ordinal scale,  interval scale, or on a ratio scale.
+- What sets apart ratio scales from interval scales: On a ratio scale, the zero point means no quantity. On an interval scale, however, the zero point doesn't indicate the absence of a quantity. It actually indicates the presence of a quantity.
+- In practice, variables measured on an interval scale are relatively rare
