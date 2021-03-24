@@ -158,4 +158,5 @@ add = lambda x, y: x + y
 - Apply lambda function as a key argument for sorted(): `sorted(hn_clean, key=lambda d: d['age'])`
 - Pandas has the pandas.read_json() function, which is designed to read JSON from either a file or a JSON string
     - Should prepare data as a list of dictionaries so pandas is easily able to convert to a dataframe.
-- We can use the pandas.DataFrame() constructor and pass the list of dictionaries directly to it to convert the JSON to a dataframe:
+- We can use the pandas.DataFrame() constructor and pass the list of dictionaries directly to it to convert the JSON to a dataframe: `hn_df = pd.DataFrame(hn_clean)`
+- *Ternary operator*: `[on_true] if [expression] else [on_false]`

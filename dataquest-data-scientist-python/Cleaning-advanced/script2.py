@@ -57,3 +57,19 @@ top_5_titles = [dict['title'] for dict in hn_sorted_points][:5]
 # Create a Pandas dataframe version of the hn_clean JSON list
 import pandas as pd
 hn_df = pd.DataFrame(hn_clean)
+
+# Check type and length of each list in tags column if consistent
+tags = hn_df['tags']
+print(tags.dtype)  #object
+tags_types = tags.apply(type)
+type_counts = tags_types.value_counts(dropna=False)
+print(type_counts)
+tags_types = tags.apply(len)  #list
+type_lengths = tags_types.value_counts(dropna=False)
+print(type_lengths)    #most 3, over 2000 4
+# Let's use a boolean mask to look at the items where the list has four items
+four_tags = tags[tags.apply(len)==4]
+
+# Use tertiary operator and lambda function: where the item is a list with length four, return the last item. In all other cases, return None.
+cleaned_tags = tags.apply(lambda tag: tag[-1] if len(tag)==4 else None)
+hn_df['tags'] = cleaned_tags
