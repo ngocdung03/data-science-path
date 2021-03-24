@@ -160,3 +160,16 @@ add = lambda x, y: x + y
     - Should prepare data as a list of dictionaries so pandas is easily able to convert to a dataframe.
 - We can use the pandas.DataFrame() constructor and pass the list of dictionaries directly to it to convert the JSON to a dataframe: `hn_df = pd.DataFrame(hn_clean)`
 - *Ternary operator*: `[on_true] if [expression] else [on_false]`
+
+##### Working with missing data
+- Series.mask(): replace certain values in a series based off a boolean mask: `Series.mask(bool_mask, val_to_replace)`
+    - can also update with the matching value from a series that has identical index labels
+    ```py
+    fruits = pd.Series(['Apple', 'Banana', 'Banana'])
+    bool = [False, True, True]  <mask>
+    nums = pd.Series(['one', 'two', 'three])
+    result = fruits.mask(bool, nums)
+    # ['Apple', 'two', 'three']
+    ```
+- To convert a dataframe to a single column of values, we use the DataFrame.stack() method, which stacks a dataframe object into a Series object
+- GeoPy package: makes working with Geocoding APIs like the Google Maps API easier. https://geopy.readthedocs.io/en/latest/

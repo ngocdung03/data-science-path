@@ -70,6 +70,6 @@ print(type_lengths)    #most 3, over 2000 4
 # Let's use a boolean mask to look at the items where the list has four items
 four_tags = tags[tags.apply(len)==4]
 
-# Use tertiary operator and lambda function: where the item is a list with length four, return the last item. In all other cases, return None.
+# Use ternary operator and lambda function: where the item is a list with length four, return the last item. In all other cases, return None.
 cleaned_tags = tags.apply(lambda tag: tag[-1] if len(tag)==4 else None)
 hn_df['tags'] = cleaned_tags
