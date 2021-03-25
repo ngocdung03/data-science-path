@@ -91,3 +91,14 @@ sns.countplot(x='age_mean_relative', hue='min_mean_relative', data=wnba)
 wnba[wnba.Age >= 27]['MIN'].plot.hist(histtype = 'step', label = 'Old', legend = True)
 wnba[wnba.Age < 27]['MIN'].plot.hist(histtype = 'step', label = 'Young', legend = True)
 ```
+- Series.plot.kde() function: Smooth out the histogram - kernel density estimate plot or, shorter, kernel density plot. 
+```
+wnba[wnba.Age >= 27]['MIN'].plot.kde(label = 'Old', legend = True)
+wnba[wnba.Age < 27]['MIN'].plot.kde(label = 'Young', legend = True)
+```
+- Comparing distributions of multiple groups:  strip plot, box-and-whisker plot
+```py
+sns.stripplot(x = 'Pos', y = 'Height', data = wnba)
+sns.boxplot(x = 'Pos', y = 'Height', data = wnba)
+```
+

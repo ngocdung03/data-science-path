@@ -118,3 +118,28 @@ wnba[wnba.Age < 27]['MIN'].plot.hist(histtype = 'step', label = 'Young', legend 
 plt.axvline(497, label='Average')
 plt.legend()
 plt.show()
+
+# Kernel density plot
+wnba[wnba.Age >= 27]['MIN'].plot.kde(label = 'Old', legend = True)
+wnba[wnba.Age < 27]['MIN'].plot.kde(label = 'Young', legend = True)
+plt.axvline(497, label='Average')
+plt.legend()  #if not, axvline's legend will not display
+plt.show()
+
+# Strip plot
+sns.stripplot(x = 'Pos', y = 'Weight', data = wnba, jitter = True)
+
+# Box plot
+sns.boxplot(x = 'Pos', y = 'Weight', data = wnba)
+plt.show()
+
+# Consider the quartiles of the Games Played variable:
+print(wnba['Games Played'].describe())
+iqr = 29-22
+lower_bound = 22 - 1.5*iqr
+upper_bound = 29 + 1.5*iqr
+outliers_low = sum(wnba['Games Played']<lower_bound)
+outliers_high = sum(wnba['Games Played']>upper_bound)
+
+sns.boxplot(wnba['Games Played'])
+plt.show()
