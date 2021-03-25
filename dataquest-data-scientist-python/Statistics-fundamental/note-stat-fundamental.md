@@ -70,3 +70,24 @@ wnba['PTS'].plot.hist(grid = True, xticks = arange(2,585,58.2), rot = 30)
 ```py
 wnba['PTS'].plot.hist(range = (1,600), bins = 3)
 ```
+##### Comparing frequency distributions
+- Grouped bar plot:
+```py
+import seaborn as sns
+sns.countplot(x = 'Exp_ordinal', hue = 'Pos', data = wnba)
+#x — specifies as a string the name of the column we want on the x-axis.
+#hue — specifies as a string the name of the column we want the bar plots generated for
+#data - specifies the name of the variable which stores the data set
+```
+- With categorized variable based on conditions
+```py
+wnba['age_mean_relative'] = wnba['Age'].apply(lambda x: 'old' if x >= 27 else 'young')
+wnba['min_mean_relative'] = wnba['MIN'].apply(lambda x: 'average or above' if x >= 497 else
+                                           'below average')
+sns.countplot(x='age_mean_relative', hue='min_mean_relative', data=wnba)
+```
+- superimposed step histograms
+```py
+wnba[wnba.Age >= 27]['MIN'].plot.hist(histtype = 'step', label = 'Old', legend = True)
+wnba[wnba.Age < 27]['MIN'].plot.hist(histtype = 'step', label = 'Young', legend = True)
+```
