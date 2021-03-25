@@ -82,3 +82,5 @@ plt.ylabel('')
 
 # Histogram
 wnba['PTS'].plot.hist()  # not wnba['PTS'].value_counts().plot.hist()
+wnba['Games Played'].plot.hist(range=(1,32), bins=8, title='The distribution of players by games played')
+plt.xlabel('Games played')

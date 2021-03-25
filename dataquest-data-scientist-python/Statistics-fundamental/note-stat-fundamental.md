@@ -61,3 +61,12 @@ wnba['Pos'].value_counts().plot.pie(figsize = (6,6), autopct = '%.1f%%')
 
 #[Percentages-display-pie-chart.jpg]
 ```
+- For visualize distribution: histogram
+    - arange() function from numpy: generate the intervals (start, end, step)
+```py
+from numpy import arange
+wnba['PTS'].plot.hist(grid = True, xticks = arange(2,585,58.2), rot = 30)
+```
+```py
+wnba['PTS'].plot.hist(range = (1,600), bins = 3)
+```
