@@ -168,3 +168,74 @@ mean_of_sample_means = sum(sample_means) / len(sample_means)
 
 unbiased = (population_mean == mean_of_sample_means)
 ######
+
+## The Weighted Mean and the Median
+#houses_per_year = pd.read_table('houses_per_year.txt')
+mean_new = houses_per_year['Mean Price'].mean()
+mean_original = houses['SalePrice'].mean()
+difference = mean_original - mean_new
+
+# Weighted mean by number of houses sold 
+weighted_mean = (houses_per_year['Mean Price']*houses_per_year['Houses Sold']).sum()/houses_per_year['Houses Sold'].sum()
+mean_original = houses['SalePrice'].mean()
+difference = round(mean_original, 10) - round(weighted_mean, 10)
+
+# Weighted by np.average() comparison
+import numpy as np
+def weighted_mean(mean_arr, weight_arr):
+    return (mean_arr*weight_arr).sum()/weight_arr.sum()
+
+weighted_mean_function = weighted_mean(houses_per_year['Mean Price'], houses_per_year['Houses Sold'])
+weighted_mean_numpy = np.average(houses_per_year['Mean Price'], weights = houses_per_year['Houses Sold'])
+equal = round(weighted_mean_function,10) == round(weighted_mean_numpy,10)
+
+# Median
+distribution1 = sorted(map(str, [23, 24, 22, '20 years or lower,', 23, 42, 35]))
+distribution2 = sorted([55, 38, 123, 40, 71])
+distribution3 = sorted(map(str, [45, 22, 7, '5 books or lower', 32, 65, '100 books or more']))
+
+median1 = 23
+median2 = 55
+median3 = 32
+
+# Finding median value of one column of houses data
+# '10 or more' is replaced by integer 10 only for sorting purposes
+new_array = houses['TotRms AbvGrd'].copy().replace('10 or more', 10).astype(int).unique()
+pd.Series(new_array).sort_values()
+median = 6
+
+### Solution ###
+# Sort the values
+rooms = houses['TotRms AbvGrd'].copy()
+rooms = rooms.replace({'10 or more': 10})
+rooms = rooms.astype(int)
+rooms_sorted = rooms.sort_values()
+
+# Find the median
+middle_indices = [int((len(rooms_sorted) / 2) - 1),
+                  int((len(rooms_sorted) / 2))
+                 ] # len - 1 and len because Series use 0-indexing 
+middle_values = rooms_sorted.iloc[middle_indices] # make sure you don't use loc[]
+median = middle_values.mean()
+######
+
+# Compare mean and median in distribution with outliers
+houses['Lot Area'].plot.box()
+plt.show()
+houses['SalePrice'].plot.box()
+plt.show()
+
+mean_lot = houses['Lot Area'].mean()
+median_lot = houses['Lot Area'].median()
+lotarea_difference = mean_lot - median_lot
+
+mean_price= houses['SalePrice'].mean()
+median_price = houses['SalePrice'].median()
+saleprice_difference = mean_price - median_price
+
+# Compare mean and median 2
+mean = houses['Overall Cond'].mean()
+median = houses['Overall Cond'].median()
+houses['Overall Cond'].plot.hist()
+more_representative = 'mean'
+# Although it can be argued that it's theoretically unsound to compute the mean for ordinal variables, in the last exercise we found the mean more informative and representative than the median. The truth is that in practice many people get past the theoretical hurdles and use the mean nonetheless because in many cases it's much richer in information than the median.
