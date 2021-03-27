@@ -239,3 +239,54 @@ median = houses['Overall Cond'].median()
 houses['Overall Cond'].plot.hist()
 more_representative = 'mean'
 # Although it can be argued that it's theoretically unsound to compute the mean for ordinal variables, in the last exercise we found the mean more informative and representative than the median. The truth is that in practice many people get past the theoretical hurdles and use the mean nonetheless because in many cases it's much richer in information than the median.
+
+## The Mode
+houses = pd.read_table('AmesHousing_1.txt')
+scale_land = 'ordinal'
+scale_roof = 'nominal'
+kitchen_variable = 'discrete'
+
+# Def mode function
+def return_mode(array):
+    count = {}
+    for i in array:
+        if i in count:
+            count[i] += 1
+        else:
+            count[i] = 1
+    # return the key with the highest count
+    return max(count, key = count.get)
+
+mode_function = return_mode(houses['Land Slope'])
+mode_method = houses['Land Slope'].mode()
+same = mode_function == mode_method
+
+# Def value_counts function
+def mode(array):
+    counts = {}
+    
+    for value in array:
+        if value in counts:
+            counts[value] += 1
+        else:
+            counts[value] = 1
+    
+    return (max(counts, key = counts.get), counts)    #error when returning list?
+
+mode, value_counts = mode(houses['Roof Style'])
+
+print(houses['Roof Style'].value_counts())
+
+# Mode of discrete variable
+bedroom_variable = 'discrete'
+bedroom_mode = houses['Bedroom AbvGr'].mode()
+price_variable = 'continuous'
+
+# Mean, median, mode in skewed  continuous distribution
+#import matplotlib.pyplot as plt
+houses['Mo Sold'].plot.kde(xlim=(1,12))
+plt.axvline(houses['Mo Sold'].mode()[0], color='green', label='Mode')   #mode() return series? error without [0]
+plt.axvline(houses['Mo Sold'].median(), color='Orange', label='Median')
+plt.axvline(houses['Mo Sold'].mean(), color='black', label='Mean')
+plt.legend()
+
