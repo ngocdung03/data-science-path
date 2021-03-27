@@ -290,3 +290,15 @@ plt.axvline(houses['Mo Sold'].median(), color='Orange', label='Median')
 plt.axvline(houses['Mo Sold'].mean(), color='black', label='Mean')
 plt.legend()
 
+## Measures of Variablity
+import pandas as pd
+houses = pd.read_table('AmesHousing_1.txt')
+
+def ret_range(arr):
+    return arr.max() - arr.min()
+
+range_by_year = {}
+for year in houses['Yr Sold'].unique():
+    data_by_year = houses[houses['Yr Sold'] == year]
+    range_by_year[year] = ret_range(data_by_year['SalePrice'])
+    

@@ -28,4 +28,6 @@
 - The mean and the median generally summarize the distribution of a discrete variable much better than the mode, and you should use the mode only if you need to communicate your results to a non-technical audience.
 - 2 modes: bimodal distribution
 - The workaround is to organize the continuous variable in a grouped frequency table, and select for the mode the midpoint of the class interval (the bin) with the highest frequency
-- [when-to-use-3M.jpg]
+- [when-to-use-3M.jpg
+
+##### Measures of Variablity
