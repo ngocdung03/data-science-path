@@ -31,4 +31,3 @@
 - [when-to-use-3M.jpg
 
 ##### Measures of Variablity
-- Note 
