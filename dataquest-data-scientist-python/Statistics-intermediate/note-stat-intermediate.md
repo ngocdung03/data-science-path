@@ -41,3 +41,22 @@
     - The sample variance *s^2* is an unbiased estimator for the population variance σ^2 only when we sample *with replacement*. however, the unbiasedness doesn't carry over mean sample standard deviation.
 - Series.std() method: ddof parameter to choose between n and n−1.
 - Variability for categorical variables: https://www.tandfonline.com/doi/full/10.1080/10691898.2007.11889465
+
+##### Z-score
+# Generate a kernel density plot for the SalePrice variable to find out how far off $220,000 is from the mean.
+- The standard score, or the z-score
+- Standard distribution, standardized distribution
+- When we standardize a sample, the resulting distribution of z-scores is itself a sample. This means that we need to use the formula for the sample standard deviation s when we compute the standard deviation. 
+```py
+from numpy import std, mean
+sample = [0,8,0,8]
+
+x_bar = mean(sample)
+s = std(sample, ddof = 1)
+
+standardized_sample = []
+for value in sample:
+    z = (value - x_bar) / s
+    standardized_sample.append(z)
+stdev_sample = std(standardized_sample, ddof=1)  #1
+```

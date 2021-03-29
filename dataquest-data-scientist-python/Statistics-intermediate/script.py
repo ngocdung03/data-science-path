@@ -410,3 +410,141 @@ for sample in samples:
 equal_var = sum(sample_vars)/2 == numpy.var(population,ddof=0)
 equal_stdev = sum(sample_sd)/2 == numpy.std(population,ddof=0)
 
+## Z-score
+# Generate a kernel density plot for the SalePrice variable to find out how far off $220,000 is from the mean.
+import pandas as pd
+houses = pd.read_table('AmesHousing_1.txt')
+houses['SalePrice'].plot.kde()
+plt.axvline(houses['SalePrice'].mean(), color='black', label='Mean')
+plt.axvline(houses['SalePrice'].mean()+ houses['SalePrice'].std(ddof=0), color='red', label='Standard deviation')
+plt.axvline(220000, color='orange', label = '220000')
+plt.legend()
+plt.xlim(houses['SalePrice'].min(), houses['SalePrice'].max())
+
+very_expensive = False
+
+# Write a function that takes in a value, the array the value belongs to, and returns the z-score of that value. Make sure your function is flexible enough to compute z-scores for both samples and populations.
+import numpy
+min_val = houses['SalePrice'].min()
+mean_val = houses['SalePrice'].mean()
+max_val = houses['SalePrice'].max()
+
+def z_score(value, array, ddof):
+    mean = numpy.mean(array)
+    std = numpy.std(array, ddof=ddof)
+    return (value - mean)/std             #have to have return otherwise error
+    
+min_z = z_score(min_val, houses['SalePrice'], 0)
+mean_z = z_score(mean_val, houses['SalePrice'], 0)
+max_z = z_score(max_val, houses['SalePrice'], 0)
+
+# Find out the location for which $200,000 has the z-score closest to 0
+def z_score(value, array, bessel = 0):
+    mean = sum(array) / len(array)
+    
+    from numpy import std
+    st_dev = std(array, ddof = bessel)
+    
+    distance = value - mean
+    z = distance / st_dev
+    
+    return z
+NAmes = z_score(220000, houses[houses['Neighborhood'] == 'NAmes']['SalePrice'])
+CollgCr = z_score(220000, houses[houses['Neighborhood'] == 'CollgCr']['SalePrice'])
+OldTown = z_score(220000, houses[houses['Neighborhood'] == 'OldTown']['SalePrice'])
+Edwards = z_score(220000, houses[houses['Neighborhood'] == 'Edwards']['SalePrice'])
+Somerst = z_score(220000, houses[houses['Neighborhood'] == 'Somerst']['SalePrice'])
+
+best_investment = 'College Creek'
+### Solution ###
+# Segment the data by location
+north_ames = houses[houses['Neighborhood'] == 'NAmes']
+clg_creek = houses[houses['Neighborhood'] == 'CollgCr']
+old_town = houses[houses['Neighborhood'] == 'OldTown']
+edwards = houses[houses['Neighborhood'] == 'Edwards']
+somerset = houses[houses['Neighborhood'] == 'Somerst']
+
+# Find the z-score for 200000 for every location
+z_by_location = {}
+for data, neighborhood in [(north_ames, 'NAmes'), (clg_creek, 'CollgCr'),
+                     (old_town, 'OldTown'), (edwards, 'Edwards'),
+                     (somerset, 'Somerst')]:
+    
+    z_by_location[neighborhood] = z_score(200000, data['SalePrice'],
+                                          bessel = 0)
+
+# Find the location with the z-score closest to 0
+print(z_by_location)
+best_investment = 'College Creek'
+######
+
+
+st_devs_away = (220000 - houses['SalePrice'].mean())/houses['SalePrice'].std(ddof=0)
+
+# Convert all values to z-scores
+mean = houses['SalePrice'].mean()
+st_dev = houses['SalePrice'].std(ddof = 0)
+# Transform to z-score distribution
+houses['z_prices'] = houses['SalePrice'].apply(
+    lambda x: ((x - mean) / st_dev)
+    )
+z_mean_price = numpy.mean(houses['z_prices'])
+z_stdev_price = numpy.std(houses['z_prices'], ddof=0)
+
+houses['z_area'] = houses['Lot Area'].apply(
+    lambda x: ((x - houses['Lot Area'].mean()) / houses['Lot Area'].std(ddof = 0))
+    )
+z_mean_area = numpy.mean(houses['z_area'])
+z_stdev_area = numpy.std(houses['z_area'], ddof=0)
+# Mean values were both extremely close to 0
+
+# Standardize the population of values stored in the population variable
+from numpy import std, mean
+population = pd.Series([0,8,0,8])
+standardized_pop = population.apply(lambda x: ((x - mean(population)) / std(population)))
+mean_z = mean(standardized_pop)
+stdev_z = std(standardized_pop) 
+
+# Standardized sample with Bessel's correction
+from numpy import std, mean
+sample = [0,8,0,8]
+
+x_bar = mean(sample)
+s = std(sample, ddof = 1)
+
+standardized_sample = []
+for value in sample:
+    z = (value - x_bar) / s
+    standardized_sample.append(z)
+stdev_sample = std(standardized_sample, ddof=1)  #1
+
+# Choose 'better' houses by different grading systems
+# Standardize the distributions of the index_1 and index_2 variables. We've coded these columns under the hood, and they're already part of the houses data set.
+standardized_index1 = houses['index_1'].apply(lambda x: ((x - mean(houses['index_1'])) / std(houses['index_1'])))
+standardized_index2 = houses['index_2'].apply(lambda x: ((x - mean(houses['index_2'])) / std(houses['index_2'])))
+print(standardized_index1.head(2))
+print(standardized_index2.head(2))
+better = 'first'
+
+### Solution ###
+mean_index1 = houses['index_1'].mean()
+stdev_index1 = houses['index_1'].std(ddof = 0)
+houses['z_1'] = houses['index_1'].apply(lambda x: 
+                                      (x - mean_index1) / stdev_index1
+                                     )
+
+mean_index2 = houses['index_2'].mean()
+stdev_index2 = houses['index_2'].std(ddof = 0)
+houses['z_2'] = houses['index_2'].apply(lambda x: 
+                                      (x - mean_index2) / stdev_index2
+                                     )
+
+print(houses[['z_1', 'z_2']].head(2))
+better = 'first'
+######
+
+# transform back to original values
+# We merged the two columns of z-scores together into a new column named z_merged
+transformed = houses['z_merged'].apply(lambda z: z*10+50)
+mean_transformed = transformed.mean()
+stdev_transformed = transformed.std(ddof=0)
