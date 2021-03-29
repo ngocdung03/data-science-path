@@ -301,4 +301,112 @@ range_by_year = {}
 for year in houses['Yr Sold'].unique():
     data_by_year = houses[houses['Yr Sold'] == year]
     range_by_year[year] = ret_range(data_by_year['SalePrice'])
+
+# Find the year with the greatest/lowest variability of prices 
+def standard_deviation(array):
+    reference_point = sum(array) / len(array)
     
+    distances = []
+    for value in array:
+        squared_distance = (value - reference_point)**2
+        distances.append(squared_distance)
+        
+    variance = sum(distances) / len(distances)
+    
+    return sqrt(variance)
+
+dict = {}
+for year in houses['Yr Sold'].unique():
+    data = houses['SalePrice'][houses['Yr Sold'] == year]
+    dict[year] = standard_deviation(data)
+
+greatest_variability = 2006
+lowest_variability = 2010
+
+### Solution ###
+for year in houses['Yr Sold'].unique():
+    year_segment = houses[houses['Yr Sold'] == year]
+    st_dev = standard_deviation(year_segment['SalePrice'])
+    years[year] = st_dev
+
+# Get years of max and min variability
+greatest_variability = max(years, key = years.get) # outputs directly the year with the maximum variability
+lowest_variability = min(years, key = years.get) # outputs directly the year with the minimum variability
+######
+
+# Sampling repeatedly a known population and see how the sample standard deviations compare on average to the population standard deviation
+def standard_deviation(array):
+    reference_point = sum(array) / len(array)
+    
+    distances = []
+    for value in array:
+        squared_distance = (value - reference_point)**2
+        distances.append(squared_distance)
+    
+    variance = sum(distances) / len(distances)
+    
+    return sqrt(variance)
+
+sample_sd = []
+import matplotlib.pyplot as plt
+for i in range(5000):
+    sample = houses['SalePrice'].sample(10, random_state=i)
+    sd = standard_deviation(sample)
+    sample_sd.append(sd)
+plt.hist(sample_sd)
+plt.axvline(standard_deviation(houses['SalePrice']))
+# Sample standard deviation usually underestimates the population standard deviation
+
+# Bessel's correction
+from math import sqrt
+def standard_deviation(array):
+    reference_point = sum(array) / len(array)
+    
+    distances = []
+    for value in array:
+        squared_distance = (value - reference_point)**2
+        distances.append(squared_distance)
+    
+    variance = sum(distances) / (len(distances)-1)
+    
+    return sqrt(variance)
+
+import matplotlib.pyplot as plt
+st_devs = []
+
+for i in range(5000):
+    sample = houses['SalePrice'].sample(10, random_state = i)
+    st_dev = standard_deviation(sample)
+    st_devs.append(st_dev)
+
+plt.hist(st_devs)
+plt.axvline(pop_stdev)  # pop_stdev is pre-saved from the last screen
+
+# Compare pandas method and numpy function
+sample = houses.sample(100, random_state = 1)
+from numpy import std, var
+pandas_stdev = sample['SalePrice'].std(ddof=1)  #default, pandas Series.std() method 
+numpy_stdev = numpy.std(sample['SalePrice'], ddof=1)  # numpy.std() function
+equal_stdevs = pandas_stdev == numpy_stdev
+pandas_var = sample['SalePrice'].var(ddof=1)
+numpy_var = numpy.var(sample['SalePrice'], ddof=1)  #default ddpf=0
+equal_vars = pandas_var == numpy_var
+
+# Assess sample var and std when sampling without replacement.
+population = [0, 3, 6]
+
+samples = [[0,3], [0,6],
+           [3,0], [3,6],
+           [6,0], [6,3]
+          ]
+sample_vars = []
+sample_sd = []
+for sample in samples:
+    variance = numpy.var(sample, ddof=0)
+    sd = numpy.std(sample, ddof=0)
+    sample_vars.append(variance)
+    sample_sd.append(sd)
+    
+equal_var = sum(sample_vars)/2 == numpy.var(population,ddof=0)
+equal_stdev = sum(sample_sd)/2 == numpy.std(population,ddof=0)
+

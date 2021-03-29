@@ -31,3 +31,13 @@
 - [when-to-use-3M.jpg
 
 ##### Measures of Variablity
+- Mean absolute deviation or average absolute deviation.
+- Variance, mean squared distance or mean squared deviation.
+    - high variability value is the direct result of the squaring process, which makes most distances much bigger than they actually are.
+    - To solve this problem and also reduce the variability value, we can take the square root of variance - *standard deviation*
+- Sample standard deviation usually underestimates the population standard deviation
+    - To correct the underestimation problem, we can try to slightly modify the sample standard deviation formula to return higher values - *Bessel's correction* - dividing by n − 1  instead of n.
+    - sample variance s^2 (which uses n−1) is an *unbiased estimator* for the population variance σ^2
+    - The sample variance *s^2* is an unbiased estimator for the population variance σ^2 only when we sample *with replacement*. however, the unbiasedness doesn't carry over mean sample standard deviation.
+- Series.std() method: ddof parameter to choose between n and n−1.
+- Variability for categorical variables: https://www.tandfonline.com/doi/full/10.1080/10691898.2007.11889465
