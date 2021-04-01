@@ -28,3 +28,12 @@ While the MAE (7.5) to RMSE (7.9056941504209481) ratio was about 1:1 for the fir
     - non-numerical values
     - missing values
     - non-ordinal values (e.g. latitude or longitude)
+- To prevent any single column from having too much of an impact on the distance, we can normalize all of the columns to have a mean of 0 and a standard deviation of 1.
+- distance.euclidean() function:
+```py
+from scipy.spatial import distance
+first_listing = [-0.596544, -0.439151]
+second_listing = [-0.596544, 0.412923]
+dist = distance.euclidean(first_listing, second_listing)
+```
+ 
