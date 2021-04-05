@@ -1,0 +1,21 @@
+# Complete Python Developer in 2021: Zero to Master
+- Python Introduction
+- Python Basic
+- Developer Environment
+- Advanced Python: Object Oriented Programming
+- Advanced Python: Functional Programming
+- Advanced Python: Decorators
+- Advanced Python: Error Handling
+- Advanced Python: Generators
+- Modules in Python
+- Debugging in Python
+- File I/O
+- Regular Expressions
+- Testing in Python
+- Career of A Python Developer
+- Scripting with Python
+- Scraping Data with Python
+- Web Development with Python
+- Automation/Testing
+- Machine Learning + Data Science
+- Where to Go From Here?
