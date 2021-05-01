@@ -1,0 +1,1 @@
+- Copy and Paste codes started with ## into script.py files. Start from Probability
