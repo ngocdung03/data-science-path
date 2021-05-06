@@ -89,3 +89,15 @@
     find / -name '*.b64'
     mv /sqlite-autoconf-3210000/tea/win/you_found_it.b64 ~
     ```
+##### Users and permissions
+- Verify user: `whoami`. Similar to but less verbose than `id -un` 
+- Example output of id: `uid=1000(dq) gid=1000(dq) groups=1000(dq),27(sudo)`
+    - uid: user ID and name in ()
+    - gid: group ID and name of group
+    - groups: lists all the groups that the user belongs, with their IDs and their names. If we wish to see what groups our user belongs to, without any aditional information, we can run the command groups. 
+- [output-of-list-long.jpg]
+- By default the group ownership is given to the primary group of the user who created the file. A primary group is simply a group that is associated with a user. It will typically have the same name and unique number than that of the user.
+- In Unix-like system, "everything is a file". The first character of the values in the first column tell us what kind of file it is. `l` tells a symbolic link, similar to a shortcut.
+- Permissions have three scopes: for the owner, for the owner group, and for everyone else
+    - For each scope, permissions are defined by a sequence of three characters called file access modes. They are, in order, the read mode, the write mode and the execute mode. It's common to call them bits [file-access-mode.jpg]
+    - if an ancestor doesn't have execution permissions, none of its descendants will either, regardless of whether the x bit is set or not.
