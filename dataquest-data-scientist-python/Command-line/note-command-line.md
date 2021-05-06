@@ -56,3 +56,36 @@
     - Rename a file or directory: `mv <old_name> <new_name>`
 
 ##### Glob patterns and wildcards
+-  In the shell, the behavior of * is almost the same: it will match any character, any number of times, except for leading dots (.)
+- Passing * as an argument to ls will cause it to list all non-hidden files and directories in the working directory, plus all files at the root of the listed directories.
+- `?` matches any character exactly one time
+- `\` is an escape character
+- We can also escape special characters by using single quotes around the word 
+- *square brackets wildcard* matches specific characters: Eg. ls [aiu]* lists items starting with either a, i, or u. [!aiu] matches characters that isn't a, i, or u
+- Note about case sensitiveness
+- Be mindful of what happens when we use a pattern that doesn't match anything together with ls: Eg. `ls ???`: there aren't any files or directories in the working directory with names that are three characters long, ??? didn't match any filename, and so ??? was passed as an argument to ls without its special meaning.
+- Characters ranges such as: [a-z], [A-Z], [0-9], [a-Z]
+- Character classes: https://www.gnu.org/software/grep/manual/html_node/Character-Classes-and-Bracket-Expressions.html
+    - [:alpha:] usual letters
+    - [:digit:] 0-9
+    - [:lower:] lowercase letters
+    - [:upper:] uppercase letters
+    - [:alnum:] letters and numbers
+    - Eg: `ls *.[[:lower:]][[:lower:]][[:lower:]]`; `[[:lower:]0]\?` All files starting with either a lowercase letter or zero, followed by a question mark.
+- We do not recommend using character ranges, and we should also be careful with character classes:
+    - Eg: [a-z] contains a, A, z not Z
+    - Locale: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap07.html#tag_07_01
+    - POSIX compliant locale: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap07.html#tag_07_03_01
+- Should be very careful when using wildcards with commands like rm, cp and mv
+    - Before using filesystem-altering commands with wildcards, make sure they'll work as you intend by using them with ls first.
+- `find` command: `find [location] -name '['filename']'`. Will search in all subdirectories of the directory. `-name` tells the criteria.
+    - To ensure that find behaves as we expect it to with regards to wildcards, we should use single quotes `?a`.
+    - `-iname`: ignore case; argument does not need single quotes? 
+    - Last time the file was accessed
+    - Last time the file was modified
+    - What type of file it is (directory, regular file, special file, etc.)
+    - Eg. Find all files in the system that end with .b64 and move them into your home directory: 
+    ```command line
+    find / -name '*.b64'
+    mv /sqlite-autoconf-3210000/tea/win/you_found_it.b64 ~
+    ```
