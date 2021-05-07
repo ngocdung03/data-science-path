@@ -148,3 +148,31 @@ unalias t
     3. Functions
     4. Regular built-ins
     5. And then it will look for files in a select list of directories called PATH (we'll learn about PATH in the next course)
+- Many times, servers will have multiple installations of the same program — possibly with different versions — which can lead to unexpected behavior. By knowing what we're running, we prevent problems from occurring and are able to debug when they happen.
+```
+python -c "print(3/2)" #1
+type python  #python2: / signifies integer division — it ignores the fractional part).
+python3 -c "print(3/2)" #1.5
+```
+- Access documentation: shell <command>
+    - Aliases and functions do not have documentation
+- Documentation of programs: `man <program>`, use up and down arrow keys to navigate, and "Q" to exit.
+        - NAME: The command's name and a brief description of what it does.
+        - SYNOPSIS: The allowed syntax.
+        - DESCRIPTION: A description of the command. It frequently includes information about its options.
+        - OPTIONS: When not included in the section above, the options are documented in this section.
+- `whatis` quickly explore the programs in /bin.
+- `help <command>`: access documentation for a specific built-in commands in Bash
+- help cd: cd [-L|[-P [-e]] [-@]] [dir]
+    - cd is mandatory and should be written as is.
+    - Every argument is optional.
+    - Let's breakdown [-L|[-P [-e]] [-@]].
+    - The available options are -L, -P, -e and -@.
+    - Since | separates -L from the rest of options, -L can't be used in conjunction with the other options.
+    - [-P [-e]] indicates that in case -P is used, we can choose whether or not to use -e, but we can't use -e without -P.
+    - We can also elect to use with -@, regardless of whether we include -P.
+    - [dir] indicates that we can also include (or not) an optional argument.
+    - To constrast with ls, note the lack of ellipsis. This argument isn't repeatable.
+    - angle brackets (< >) to signify that an argument is replaceable and mandatory.
+- less: Terminal pager. Similar to more. [less-features.jpg]
+- Most popular regex used in shells: https://www.gnu.org/software/grep/manual/html_node/Regular-Expressions.html
