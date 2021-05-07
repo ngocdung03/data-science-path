@@ -101,3 +101,50 @@
 - Permissions have three scopes: for the owner, for the owner group, and for everyone else
     - For each scope, permissions are defined by a sequence of three characters called file access modes. They are, in order, the read mode, the write mode and the execute mode. It's common to call them bits [file-access-mode.jpg]
     - if an ancestor doesn't have execution permissions, none of its descendants will either, regardless of whether the x bit is set or not.
+- Change permissions: `chmod permissions files`. `permissions` argument can be divided into three components:
+    - Scope: owner/user (u), group (g), others (o), all (a)
+    - Operator: add (+), remove (-), set (=)
+    - Mode: read(r), write (w), execute(x)
+    ```
+    # chmod [ugoa][+-=][rwx] files
+    chmod u+x my file  # change rw-rw-r-- into rwxrw-r--
+    chmod u=rwx,g=rx,o=r my_file  #not including spaces
+    ```
+    - The operator + causes the selected file mode bits to be added to the existing file mode bits of each file; - causes them to be removed; and = causes them to be added and causes unmentioned bits to be removed.
+- stat: see file status
+- numeric codification of permissions (octal notation): 
+    - all permissions can be obtained from its building blocks -:0, x:1, w:2 and r:4. If we want permission to read and write, we just add the corresponding digits (4 and 2, respectively), giving rw-:6. If we want permission to write and execute, the result is -wx:3 (because 0+2+1=3).
+    - The first digit concerns the special permissions
+- Root user, administrator, superuser
+- `sudo` (superuser do): run commands as if we were other users: `sudo <command>`. `sudo !!`
+- Change ownership: `chown` change owner. `chown [new_owner][:new_group] file(s)`. [] means what's inside is optional
+- We only had to input the password once. That's because sudo will cache the credentials for 15 minutes (by default).
+- From the point of view of the owner of a file, the permissions of the owner have priority over those of its primary group.
+
+#### Text processing in the command line
+##### Getting help and reading documentation
+- Some programs — specifically those that run with their own executable file — are commands. Eg. Python, Bash
+- Programs that are essential to having the system running are usually located in /usr/bin
+- 5 different types of commands:
+     - file: Usually refered to as program, utility, tool, or sometimes just command, these are simply executable files (analogous to Windows' files whose extension is exe).
+    - builtin: Usually refered to as a command or built-in command. Built-in commands are always available in RAM (a special kind of computer memory that is very fast to access, contrary to hard drives). They run quickly and are always available, which is useful when we need to troubleshoot problems in the system.
+    - alias: This is just a different name for a command. We usually use aliases to abbreviate frequently used commands.
+    - function: A function here is similar to what you learned in Python, only it is in a different language (namely the shell language that we happen to be using).
+    - keyword: Keywords are words reserved for specific things and shouldn't be used for other purposes (like being aliases). We'll become more familiar with them when we learn about programming in the shell.
+- `type` figure out a command's type: `type pwd`
+    - In Bash, probably -t option to get output that is less verbose
+    - -P option in Bash
+- `declare -F` Commands and features that aren't POSIX compliant and are available in Bash are called bashisms
+- `compgen` generate completions for partial names. https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html
+- Set `alias`
+```
+alias t=type
+t pwd t #equivalent to running `type pwd t'
+unalias t
+```
+- When commands of different types have the same name, the priority is in order:
+    1. Aliases
+    2. Special built-ins (a small list of built-ins that are considered special)
+    3. Functions
+    4. Regular built-ins
+    5. And then it will look for files in a select list of directories called PATH (we'll learn about PATH in the next course)
