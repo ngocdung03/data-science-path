@@ -176,3 +176,13 @@ python3 -c "print(3/2)" #1.5
     - angle brackets (< >) to signify that an argument is replaceable and mandatory.
 - less: Terminal pager. Similar to more. [less-features.jpg]
 - Most popular regex used in shells: https://www.gnu.org/software/grep/manual/html_node/Regular-Expressions.html
+
+##### File inspection
+- Data: https://github.com/fivethirtyeight/data/blob/master/college-majors/recent-grads.csv
+- Non-paging alternatives to inspect files: `head -n 5 example_data.csv`. Can use tail
+    - An option-argument: an argument that is passed to an option (5 was passed to -n in the example).
+    - head -n -5: all except last 5 lines
+    - tail -n 15: last 15 lines
+    - tail -n +15: all starting from and including line 15
+- wc: word count for text file. Output: lines words byte
+    - To count characters in the shell's default encoding, we can pass the -m option to wc.
