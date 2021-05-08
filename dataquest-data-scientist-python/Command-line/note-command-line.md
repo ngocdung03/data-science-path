@@ -179,10 +179,22 @@ python3 -c "print(3/2)" #1.5
 
 ##### File inspection
 - Data: https://github.com/fivethirtyeight/data/blob/master/college-majors/recent-grads.csv
-- Non-paging alternatives to inspect files: `head -n 5 example_data.csv`. Can use tail
+- Non-paging alternatives cd to inspect files: `head -n 5 example_data.csv`. Can use tail
     - An option-argument: an argument that is passed to an option (5 was passed to -n in the example).
     - head -n -5: all except last 5 lines
     - tail -n 15: last 15 lines
     - tail -n +15: all starting from and including line 15
 - wc: word count for text file. Output: lines words byte
     - To count characters in the shell's default encoding, we can pass the -m option to wc.
+- `column`: prints the contents by columns instead of having it be one long list.
+    - `-t`: output like a table
+    - `-s`: specify a set of characters for delimiting columns for the -t option. `column -s"," -t example_data.csv`
+    - If mistakenly use this command for a very large file, use "Ctrl-C" to interrupt. `less` is a better option for large files.
+- `shuf` (shuffle): for extracting random lines from a file.
+    - `-n <number>`: display a number of lines
+- Most of the files do not have an extension because *nix systems determine what kind of a file is by peeking into its contents and applying some heuristics (like magic numbers).
+- `file`: figure out what kind of a file is
+
+
+
+
