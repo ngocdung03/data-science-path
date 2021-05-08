@@ -195,6 +195,19 @@ python3 -c "print(3/2)" #1.5
 - Most of the files do not have an extension because *nix systems determine what kind of a file is by peeking into its contents and applying some heuristics (like magic numbers).
 - `file`: figure out what kind of a file is
 
-
-
+##### Text processing
+- One of the advantages of the shell over Python is since commands interact more intimately with the filesystem, it tends to be faster for tasks directly concerning input and output of files. It's very common to use the shell to prune a text file to obtain only the information that is relevant to us, and then work on it using Python.
+- `cat` concatenates the contents of the arguments, in order, and displays them.
+- `tac` concatenates in reverse order of the lines while keeping the order of the files
+- `sort` sorts the lines of the files lexicographically.
+    - `-r` reverse order
+    - `-u` keeps only reverse results
+    - with >1 argument: concatenate the files and sort them
+    - places each lowercase letter immediately above its uppercase version
+    - `-t` the character used for separating the fields
+    - `-k` (for key): tell a specific column to sort for:
+        - Can pass `-g` together with -k to make the shell sort the numbers numerically.
+        - `-r` for reverse order
+        - Recerives a range as an argument. Eg 1,1 for only the 1st column
+    - `sort -t"," -k1,1g example_data_no_header.csv`
 
