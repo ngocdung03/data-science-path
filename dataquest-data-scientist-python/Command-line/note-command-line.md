@@ -214,3 +214,14 @@ python3 -c "print(3/2)" #1.5
     - `-d`: tell the specific character as delimiter, equivalent with -t
     - `-f`: specifies the range of fields
     - `cut -d"," -f2,3,7-9 example_data.csv` (doesn't permit reordering)
+- `grep` (global regular expressions print.): print lines matching a pattern
+    - -n displays what line the match corresponds to
+    - -v get all the lines that do not match the pattern 
+    - -i option is the short form of the self-descriptive long option --ignore-case. It makes it so that case does not matter in the pattern
+    ```
+    # the pattern [aeiou].[aeiou] matches any lowercase vowel, followed by any character (other than new line characters), followed by any lowercase vowel
+    grep -n '[aeiou].[aeiou]' characters_no_header
+    ```
+    - any lines of characters_no_header that do not end with the number 9: `grep -v '9$' characters_no_header`
+    - any lines of any file in rg_data that have fields starting with the word math, while ignoring case: `grep -i ',Math` *`
+    - -E stands for extended regular expressions. To use the functionality of the listed characters as we learned in Python, we should be using the -E option, while quoting the pattern. In  basic  regular  expressions, the meta-characters ?, +, {, |, (, and ) lose their special meaning; instead use the backslashed versions \?, \+, \{, \|, \(, and \).
