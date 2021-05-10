@@ -208,6 +208,9 @@ python3 -c "print(3/2)" #1.5
     - `-k` (for key): tell a specific column to sort for:
         - Can pass `-g` together with -k to make the shell sort the numbers numerically.
         - `-r` for reverse order
-        - Recerives a range as an argument. Eg 1,1 for only the 1st column
+        - Recerives a range as an argument. Eg 1,1 for only the 1st column. When we pass a range of the form start,stop, sort will look at the columns start through stop as one field only.
     - `sort -t"," -k1,1g example_data_no_header.csv`
-
+- `cut` displays selected columns: 
+    - `-d`: tell the specific character as delimiter, equivalent with -t
+    - `-f`: specifies the range of fields
+    - `cut -d"," -f2,3,7-9 example_data.csv` (doesn't permit reordering)
