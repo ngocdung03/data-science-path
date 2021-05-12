@@ -228,7 +228,6 @@ python3 -c "print(3/2)" #1.5
     - `-h` exclude filenames
 ##### Redirection and pipelines
 - Output redirection: save output in another file
-- Connecting commands together
 - echo: print argument to the screen
     - `echo "Trying out >." > my_first_redirection`: save/overwrite the content to the file after redirection operator `>` 
 - printf: print formatted
@@ -237,4 +236,9 @@ python3 -c "print(3/2)" #1.5
 grep -hi ',math' rg_data/* > math_data
 ```
 - `>>` appends to the target file, if the target file exists, otherwise it creates a new file. 
-
+- Creating one or more new empty file: `touch` (can overwrite exist files)
+- Connecting commands together - pipeline
+    - `cut -d"," -f2,5 example_data.csv | grep "^0"`
+- To count the number of files we'll pass the output of ls -l /bin to wc -l (the -l option of wc outputs only the number of lines). Since we'll need to exclude the first row (which shows the size of /bin), we'll pipe the output of ls -l /bin to tail -n+2 (this will print all the rows starting from the second one) and then pipe this output to wc -l: `ls -l /bin | tail -n+2 | wc -l`
+- count the number of directories.: `ls -l /bin | grep "^d" | wc -l`
+- null device, /dev/null is a special file used to discard data. Any data redirected to this file will be ignored by the operating system and simply disappear. This is useful when a command performs an action and outputs something, but we just care about the action.
