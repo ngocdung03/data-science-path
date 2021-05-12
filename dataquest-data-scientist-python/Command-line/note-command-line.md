@@ -230,10 +230,11 @@ python3 -c "print(3/2)" #1.5
 - Output redirection: save output in another file
 - Connecting commands together
 - echo: print argument to the screen
-    - `echo "Trying out >." > my_first_redirection`: save/overwrite the content to the file after redirection operator > 
+    - `echo "Trying out >." > my_first_redirection`: save/overwrite the content to the file after redirection operator `>` 
 - printf: print formatted
 ```
 # create a file called math_data with contents that are any lines of any file in the directory rg_data that have fields starting with the word math, while ignoring case and excluding the filenames.
 grep -hi ',math' rg_data/* > math_data
 ```
+- `>>` appends to the target file, if the target file exists, otherwise it creates a new file. 
 
