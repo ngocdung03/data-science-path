@@ -251,3 +251,7 @@ grep -hi ',math' rg_data/* > math_data
 - Redirecting standard errors requires its own syntax:
     - `rm /dev/null 2> err`
     - `rm /dev/null 2>> err`
+    - To redirect output to one file and error to one file": `ls east south >out 2>err` (Should not simply concatenate >> 2>> otherwise overwriting happens)
+- A parent process is a process that spawned another process.
+- For each process, the operating system will create a table that will refer to 3 streams by non-negative integers called File descriptors: 0-stdin, 1-stout, 2-stderr
+- Duplicating file descriptors: Running command 2>&1 will copy file descriptor 1 into 2. This means that whatever is written to fd 2 will go to where fd 1 goes: `ls /dev/null /home/indexistent >all_output_v2 2>&1`
