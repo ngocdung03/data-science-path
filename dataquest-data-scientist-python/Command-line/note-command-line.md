@@ -230,7 +230,7 @@ python3 -c "print(3/2)" #1.5
 - Output redirection: save output in another file
 - echo: print argument to the screen
     - `echo "Trying out >." > my_first_redirection`: save/overwrite the content to the file after redirection operator `>` 
-- printf: print formatted
+- `printf` (print formatted):  print to screen, more powerful than `echo` and is implemented in many programming languages including Python
 ```
 # create a file called math_data with contents that are any lines of any file in the directory rg_data that have fields starting with the word math, while ignoring case and excluding the filenames.
 grep -hi ',math' rg_data/* > math_data
@@ -242,3 +242,12 @@ grep -hi ',math' rg_data/* > math_data
 - To count the number of files we'll pass the output of ls -l /bin to wc -l (the -l option of wc outputs only the number of lines). Since we'll need to exclude the first row (which shows the size of /bin), we'll pipe the output of ls -l /bin to tail -n+2 (this will print all the rows starting from the second one) and then pipe this output to wc -l: `ls -l /bin | tail -n+2 | wc -l`
 - count the number of directories.: `ls -l /bin | grep "^d" | wc -l`
 - null device, /dev/null is a special file used to discard data. Any data redirected to this file will be ignored by the operating system and simply disappear. This is useful when a command performs an action and outputs something, but we just care about the action.
+
+##### Standard streams and file descriptors
+- Every process — every running instance of a command - interacts with its environment by means of communication channels called streams. In *nix systems, processes commonly start with three special kinds of streams called standard streams:
+    - Standard input (stdin): receives input
+    - Standard output (stdout): where command output goes
+    - Standard error (stderr): where error messages go
+- Redirecting standard errors requires its own syntax:
+    - `rm /dev/null 2> err`
+    - `rm /dev/null 2>> err`
