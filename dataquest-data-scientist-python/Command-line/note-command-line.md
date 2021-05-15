@@ -255,3 +255,18 @@ grep -hi ',math' rg_data/* > math_data
 - A parent process is a process that spawned another process.
 - For each process, the operating system will create a table that will refer to 3 streams by non-negative integers called File descriptors: 0-stdin, 1-stout, 2-stderr
 - Duplicating file descriptors: Running command 2>&1 will copy file descriptor 1 into 2. This means that whatever is written to fd 2 will go to where fd 1 goes: `ls /dev/null /home/indexistent >all_output_v2 2>&1`
+- Note: `2>&1 >filename` is equivalent to `>filename`
+- Standard input: can insert data manually into the shell
+```
+sort -u >sorted_stdin
+a
+i
+u
+<Ctrl-D - signals the end of transmission>
+cat sorted_stdin
+```
+- Some commands only take input from stdin, eg. `tr` - replace characters with (possibly other) characters
+    - stdin redirection: use `<`, equivalent to `0<`
+    ```
+    tr [:upper:] [:lower:] 0<east
+    ```
