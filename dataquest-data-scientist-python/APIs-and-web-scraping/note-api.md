@@ -31,4 +31,48 @@ status_code = response.status_code
     print(response.content)
     ```
     - JSON format: encodes data structures like lists and dictionaries as strings to ensure that machines can read them easily. JSON is the main format for sending and receiving data through APIs.
-    
+        - json library in Python: 2 main methods: dumps - take a Python object and converts to a string; loads - take a JSON string and converts to a Python object.
+        - We can convert lists and dictionaries to JSON, and vice versa
+        ```py
+        # Make a list of fast food chains.
+    best_food_chains = ["Taco Bell", "Shake Shack",     "Chipotle"]
+    print(type(best_food_chains))
+    # Import the JSON library.
+    import json
+    # Use json.dumps to convert best_food_chains to a   string.
+    best_food_chains_string = json.dumps(best_food_chains)
+    print(type(best_food_chains_string))
+    # Convert best_food_chains_string back to a list.
+    print(type(json.loads(best_food_chains_string)))
+    # Make a dictionary
+    fast_food_franchise = {
+        "Subway": 24722,
+        "McDonalds": 14098,
+        "Starbucks": 10821,
+        "Pizza Hut": 7600
+    }
+    # We can also dump a dictionary to a string and load    it.
+    fast_food_franchise_string = json.dumps (fast_food_franchise)
+    print(type(fast_food_franchise_string))
+    # Use the JSON function loads to convert    fast_food_franchise_string to a Python object.
+    fast_food_franchise_2 = json.loads  (fast_food_franchise_string)
+    ```
+    - get the content of a response as a Python object by .json() method:
+    ```py
+    # Make the same request we did two screens ago.
+    parameters = {"lat": 37.78, "lon": -122.41}
+    response = requests.get("http://api.open-notify.org/    iss-pass.json", params=parameters)
+
+    # Get the response data as a Python object.  Verify     that it's a dictionary.
+    json_data = response.json()
+    print(type(json_data))
+    print(json_data)
+    # Get the duration value of the ISS's first pass over   San Francisco 
+    first_pass_duration = json_data["response"][0]  ["duration"]
+
+- The server sends more than a status code and the data when it generates a response. It also sends metadata with information on how it generated the data and how to decode it. This information appears in the *response headers*: `responde.headers`
+- OpenNotify has one more API endpoint, astros.json. It tells us how many people are currently in space.
+```py
+response = requests.get("http://api.open-notify.org/astros.json")
+in_space_count = response.json()["number"]
+```
