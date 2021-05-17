@@ -16,3 +16,19 @@ status_code = response.status_code
     - 400 — The server thinks you made a bad request. This can happen when you don't send the information the API requires to process your request (among other things).
     - 403 — The resource you're trying to access is forbidden, and you don't have the right permissions to see it.
     - 404 — The server didn't find the resource you tried to access.
+- Adding query parameters: `http://api.open-notify.org/iss-pass.json?lat=40.71&lon=-74`
+    - It's almost always better to set up the parameters as a dictionary, because the requests library we mentioned earlier takes care of certain issues, like properly formatting the query parameters.
+    ```json
+    # Set up the parameters we want to pass to the API.
+    # This is the latitude and longitude of New York City.
+    parameters = {"lat": 40.71, "lon": -74}
+    # Make a get request with the parameters.
+    response = requests.get("http://api.open-notify.org/    iss-pass.json", params=parameters)
+    # Print the content of the response (the data the   server returned)
+    print(response.content)
+    # This gets the same data as the command above
+    response = requests.get("http://api.open-notify.org/    iss-pass.json?lat=40.71&lon=-74")
+    print(response.content)
+    ```
+    - JSON format: encodes data structures like lists and dictionaries as strings to ensure that machines can read them easily. JSON is the main format for sending and receiving data through APIs.
+    
