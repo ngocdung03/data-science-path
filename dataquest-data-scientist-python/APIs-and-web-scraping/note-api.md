@@ -76,3 +76,17 @@ status_code = response.status_code
 response = requests.get("http://api.open-notify.org/astros.json")
 in_space_count = response.json()["number"]
 ```
+
+##### Intermediate APIs
+- To authenticate with API, we need to use an access token, which can have scopes and specific permissions
+```json
+# Create a dictionary of headers containing our Authorization header.
+headers = {"Authorization": "token 1f36137fbbe1602f779300dad26e4c1b7fbab631"}
+
+# Make a GET request to the GitHub API with our headers.
+# This API endpoint will give us details about Vik Paruchuri.
+response = requests.get("https://api.github.com/users/VikParuchuri", headers=headers)
+
+# Print the content of the response.  As you can see, this token corresponds to the account of Vik Paruchuri.
+print(response.json())
+```
