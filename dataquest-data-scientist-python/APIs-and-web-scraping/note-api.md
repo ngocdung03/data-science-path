@@ -82,11 +82,27 @@ in_space_count = response.json()["number"]
 ```json
 # Create a dictionary of headers containing our Authorization header.
 headers = {"Authorization": "token 1f36137fbbe1602f779300dad26e4c1b7fbab631"}
-
 # Make a GET request to the GitHub API with our headers.
 # This API endpoint will give us details about Vik Paruchuri.
 response = requests.get("https://api.github.com/users/VikParuchuri", headers=headers)
-
 # Print the content of the response.  As you can see, this token corresponds to the account of Vik Paruchuri.
 print(response.json())
 ```
+- Pagination: API provider will only return a certain number of records per page. You can specify the page number that you want to access. To access all of the pages, you need to write a loop.
+- Since we've authenticated with our token, the system knows who we are, and it can show us some relevant information without us specifying our username: `user = requests.get("https://api.github.com/user", headers=headers).json()`
+- POST requests: send information (instead of retrieve it), and to create objects on the API's server.
+- Consult API's documentation to figure out which endpoints accept which types of requests: https://docs.github.com/en/rest
+    - A successful POST request will usually return a 201 status code indicating that it created the object on the server. Sometimes, the API will return the JSON representation of the new object as the content of the response.
+    ```json
+    payload = {"name": "test"}
+    requests.post("https://api.github.com/user/repos",  json=payload, headers = headers)
+    ```
+- Update an existing object, instead of creating a new one: 
+    - PATCH requests: change a few attributes of an object, but don't want to resend the entire object to the server. 
+    - PUT requests: send the complete object we're revising as a replacement for the server's existing version.
+    ```json
+    payload = {"description": "The best repository ever!", "name": "test"}
+    response = requests.patch("https://api.github.com/repos/VikParuchuri/test", json=payload)
+    ```
+- DELETE request removes objects from the server: `response = requests.delete("https://api.github.com/repos/VikParuchuri/test")`
+    - A successful DELETE request will usually return a 204 status code indicating that it successfully deleted the object.
