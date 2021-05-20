@@ -106,3 +106,5 @@ print(response.json())
     ```
 - DELETE request removes objects from the server: `response = requests.delete("https://api.github.com/repos/VikParuchuri/test")`
     - A successful DELETE request will usually return a 204 status code indicating that it successfully deleted the object.
+
+##### Challenge: working with the reddit APIs
