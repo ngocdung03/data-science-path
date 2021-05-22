@@ -108,4 +108,10 @@ print(response.json())
     - A successful DELETE request will usually return a 204 status code indicating that it successfully deleted the object.
 
 ##### Challenge: working with the reddit APIs
-- 
+- OAuth: `{"Authorization": "bearer 13426216-4U1ckno9J5AiK72VRbpEeBaMSKk"}`
+- Documentation for the /r/python/top endpoint: https://old.reddit.com/dev/api#GET_{sort}
+```json
+# Retrieve the /r/python subreddit's top posts for the past day.
+response = requests.get("https://oauth.reddit.com/r/python/top", headers = {"Authorization": "bearer 13426216-4U1ckno9J5AiK72VRbpEeBaMSKk", "User-Agent": "Dataquest/1.0"}, params={"t":"day"})
+python_top = response.json()
+```
