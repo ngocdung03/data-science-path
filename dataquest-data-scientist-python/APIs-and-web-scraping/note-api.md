@@ -116,5 +116,4 @@ response = requests.get("https://oauth.reddit.com/r/python/top", headers = {"Aut
 python_top = response.json()
 ```
 
-##### Challenge: working with the reddit APIs
    
