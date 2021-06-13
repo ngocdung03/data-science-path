@@ -115,4 +115,18 @@ print(response.json())
 response = requests.get("https://oauth.reddit.com/r/python/top", headers = {"Authorization": "bearer 13426216-4U1ckno9J5AiK72VRbpEeBaMSKk", "User-Agent": "Dataquest/1.0"}, params={"t":"day"})
 python_top = response.json()
 ```
-C:\Users\ngocdung\Dropbox\Front-end developer\src\data-science-path\dataquest-data-scientist-python 
+- Find the article with the most upvotes
+```json
+# The variable python_top is a dictionary containing information about all of the individual posts that reddit users submitted during the past day.
+# More about python_top format: https://old.reddit.com/dev/api#listings
+# Extract the list containing all of the posts:
+python_top_articles = python_top['data']['children']
+# Find the post with the most upvotes
+most_upvoted = ''
+most_upvotes = 0
+for article in python_top_articles:
+    ar = article['data']
+    if ar['ups'] >= most_upvotes:
+        most_upvoted = ar['id']
+        most_upvotes = ar['ups']
+``` 
