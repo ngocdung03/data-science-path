@@ -130,3 +130,34 @@ for article in python_top_articles:
         most_upvoted = ar['id']
         most_upvotes = ar['ups']
 ``` 
+- Get all of the comments on the /r/python subreddit's top post from the past day.
+```json
+# Now that you have the ID for the most upvoted post, you can retrieve the comments on it using the /r/{subreddit}/comments/{article} endpoint. Replace the items in brackets with the appropriate values: {subreddit} — The name of the subreddit the post appears in (note that we already included leading /r in the URL). Use python for the python subreddit, for example. {article} — The ID for the post with the comments we want to retrieve. It should look like this: 4b7w9u.
+# Make a GET request to the URL -> get response data using the response's json method.
+headers = {"Authorization": "bearer 13426216-4U1ckno9J5AiK72VRbpEeBaMSKk", "User-Agent": "Dataquest/1.0"}
+comments = requests.get('https://oauth.reddit.com/r/python/comments/4b7w9u', headers = headers).json()
+```
+
+- Find the most upvoted top-level comment in comments.
+```json
+# The first item in the list contains information about the post, and the second item contains information about the comments.
+# Reddit users can comment on comments. This means that comments have one more key than posts do. The additional key, replies, contains the nested comments. 
+# It's easier to focus on top-level comments and ignore the nested replies.
+comments
+comments_list = comments[1]['data']['children']
+most_upvoted_comment = ''
+most_upvotes_comment = 0
+for comment in comments_list:
+    cm = comment['data']
+    if cm['ups'] > most_upvotes_comment:
+        most_upvoted_comment = cm['id']
+        most_upvotes_comment = cm['ups']
+```
+
+- Make a POST request to the /api/vote endpoint to upvote the most upvoted comment from the last screen.
+```json
+headers = {"Authorization": "bearer 13426216-4U1ckno9J5AiK72VRbpEeBaMSKk", "User-Agent": "Dataquest/1.0"}
+payload = {'dir': 1, 'id': most_upvoted_comment}
+status = requests.post('https://oauth.reddit.com/api/vote', json = payload, headers=headers).status_code
+```
+
