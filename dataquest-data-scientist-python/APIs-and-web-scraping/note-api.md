@@ -161,4 +161,4 @@ payload = {'dir': 1, 'id': most_upvoted_comment}
 status = requests.post('https://oauth.reddit.com/api/vote', json = payload, headers=headers).status_code
 ```
 
-##### Web Scraping 
+##### Web Scraping  
