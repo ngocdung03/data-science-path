@@ -162,3 +162,72 @@ status = requests.post('https://oauth.reddit.com/api/vote', json = payload, head
 ```
 
 ##### Web Scraping
+- HTML basics: https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/HTML_basics
+- List of all possible HTML tags: https://developer.mozilla.org/en-US/docs/Web/HTML/Element
+```py
+# requests was imported already 
+response = requests.get('http://dataquestio.github.io/web-scraping-pages/simple.html')
+content = response.content
+```
+- BeautifulSoup library allows us to extract tags from an HTML document: https://www.crummy.com/software/BeautifulSoup/
+- Retrieving elements from a page:
+```py
+from bs4 import BeautifulSoup
+
+# Initialize the parser, and pass in the content we grabbed earlier.
+parser = BeautifulSoup(content, 'html.parser')
+
+# Get the body tag from the document.
+# Since we passed in the top level of the document to the parser, we need to pick a branch off of the root.
+# With BeautifulSoup, we can access branches by using tag types as attributes.
+body = parser.body
+
+# Get the p tag from the body.
+p = body.p
+
+# Print the text inside the p tag.
+# Text is a property that gets the inside text of a tag.
+print(p.text)
+```
+- `find_all` method: find all occurrences of a tag in the current element, and return a list. If we only want the first occurrence of an item, we'll need to index the list to get it. 
+```py
+parser = BeautifulSoup(content, 'html.parser')
+
+# Get a list of all occurrences of the body tag in the element.
+body = parser.find_all("body")
+
+# Get the paragraph tag.
+p = body[0].find_all("p")
+
+# Get the text.
+print(p[0].text)
+
+# Get title text
+title_text = parser.find_all('head')[0].find_all('title')[0].text   #index [0] is mandatory
+```
+- HTML uses the div tag to create a divider that splits the page into logical units. We can think of a divider as a "box" that contains content. For example, different dividers hold a Web page's footer, sidebar, and horizontal menu.
+- Access contents through IDs:
+```py
+# Get the page content and set up a new parser.
+response = requests.get("http://dataquestio.github.io/web-scraping-pages/simple_ids.html")
+content = response.content
+parser = BeautifulSoup(content, 'html.parser')
+
+# Pass in the ID attribute to only get the element with that specific ID.
+first_paragraph = parser.find_all("p", id="first")[0]   #index [0] is mandatory
+print(first_paragraph.text)
+```
+- In HTML, elements can also have classes. Classes aren't globally unique. In other words, many different elements belong to the same class, usually because they share a common purpose or characteristic. One element can even have multiple classes.
+- Select elements by class
+```py
+# Get the website that contains classes.
+response = requests.get("http://dataquestio.github.io/web-scraping-pages/simple_classes.html")
+content = response.content
+parser = BeautifulSoup(content, 'html.parser')
+
+# Get the first inner paragraph.
+# Find all the paragraph tags with the class inner-text.
+# Then, take the first element in that list.
+first_inner_paragraph = parser.find_all("p", class_="inner-text")[0]
+print(first_inner_paragraph.text)
+```
