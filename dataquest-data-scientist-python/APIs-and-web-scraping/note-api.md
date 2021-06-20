@@ -231,3 +231,37 @@ parser = BeautifulSoup(content, 'html.parser')
 first_inner_paragraph = parser.find_all("p", class_="inner-text")[0]
 print(first_inner_paragraph.text)
 ```
+- [CSS Selectors.html] - open with MS Edge
+- We can use BeautifulSoup's .select method to work with CSS selectors.
+- Select elements using CSS Selectors
+```py
+# Get the website that contains classes and IDs.
+response = requests.get("http://dataquestio.github.io/web-scraping-pages/ids_and_classes.html")
+content = response.content
+parser = BeautifulSoup(content, 'html.parser')
+
+# Select all of the elements that have the first-item class.
+first_items = parser.select(".first-item")
+
+# Print the text of the first paragraph (the first element with the first-item class).
+print(first_items[0].text)
+
+second_text = parser.select('#second')[0].text
+```
+- [Nesting CSS Selectors.html]
+- Using nested CSS selectors
+```py
+# Get the Superbowl box score data.
+response = requests.get("http://dataquestio.github.io/web-scraping-pages/2014_super_bowl.html")
+content = response.content
+parser = BeautifulSoup(content, 'html.parser')
+
+# Find the number of turnovers the Seahawks committed.
+turnovers = parser.select("#turnovers")[0]
+seahawks_turnovers = turnovers.select("td")[1]
+seahawks_turnovers_count = seahawks_turnovers.text
+print(seahawks_turnovers_count)
+
+patriots_total_plays_count = parser.select('#total-plays td')[2].text
+seahawks_total_yards_count = parser.select('#total-yards td')[1].text
+```
