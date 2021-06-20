@@ -36,4 +36,6 @@ first_listing = [-0.596544, -0.439151]
 second_listing = [-0.596544, 0.412923]
 dist = distance.euclidean(first_listing, second_listing)
 ```
- 
+- Calculate Euclidean distance: distance.euclidean() function from scipy.spatial, which takes in 2 vectors as the parameters and calculates the Euclidean distance between them.  
+- KNeighborsRegressor(): takes a matrix-like object and a list-like object
+- Intead of calculating MSE and RMSE using pandas arithmetic operators, we can instead use the sklearn.metrics.mean_squared_error function(). Once you become familiar with the different machine learning concepts, unifying your workflow using scikit-learn helps save you a lot of time and avoid mistakes.
