@@ -39,3 +39,7 @@ dist = distance.euclidean(first_listing, second_listing)
 - Calculate Euclidean distance: distance.euclidean() function from scipy.spatial, which takes in 2 vectors as the parameters and calculates the Euclidean distance between them.  
 - KNeighborsRegressor(): takes a matrix-like object and a list-like object
 - Intead of calculating MSE and RMSE using pandas arithmetic operators, we can instead use the sklearn.metrics.mean_squared_error function(). Once you become familiar with the different machine learning concepts, unifying your workflow using scikit-learn helps save you a lot of time and avoid mistakes. 
+
+##### Hyperparameter Optimization
+- In other words, we're impacting how the model performs without trying to change the data that's used.
+- Values that affect the behavior and performance of a model that are unrelated to the data that's used are referred to as hyperparameters. 
