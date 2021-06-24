@@ -78,5 +78,99 @@ for k in hyper_params:
     knn = KNeighborsRegressor(n_neighbors = k, algorithm = 'brute')
     knn.fit(train_df[['accommodates', 'bedrooms', 'bathrooms', 'number_of_reviews']], train_df['price'])
     predictions = knn.predict(test_df[['accommodates', 'bedrooms', 'bathrooms', 'number_of_reviews']])
-    mse_values = mean_squared_error(test_df['price'], predictions)
-    print(mse_values)
+    mse_value = mean_squared_error(test_df['price'], predictions)
+    mse_values.append(mse_value)
+    
+print(mse_values)
+
+plt.scatter(hyper_params, mse_values)
+plt.show()
+
+# Find k such as mse is the lowest
+two_features = ['accommodates', 'bathrooms']
+three_features = ['accommodates', 'bathrooms', 'bedrooms']
+hyper_params = [x for x in range(1,21)]
+# Append the first model's MSE values to this list.
+two_mse_values = list()
+for hp in hyper_params:
+    knn = KNeighborsRegressor(n_neighbors = hp, algorithm ='brute')
+    knn.fit(train_df[two_features], train_df['price'])
+    predictions = knn.predict(test_df[two_features])
+    mse_value = mean_squared_error(test_df['price'], predictions)
+    two_mse_values.append(mse_value)
+    
+# Append the second model's MSE values to this list.
+three_mse_values = list()
+for hp in hyper_params:
+    knn = KNeighborsRegressor(n_neighbors = hp, algorithm ='brute')
+    knn.fit(train_df[three_features], train_df['price'])
+    predictions = knn.predict(test_df[three_features])
+    mse_value = mean_squared_error(test_df['price'], predictions)
+    three_mse_values.append(mse_value)
+    
+two_hyp_mse = dict()
+two_lowest_mse = two_mse_values[0]
+two_lowest_k = 1
+for k, mse in enumerate(two_mse_values):
+    if mse < two_lowest_mse:
+        two_lowest_mse = mse 
+        two_lowest_k = k+1   #error when += 1 and mse doesn't consistenly decrease
+two_hyp_mse[two_lowest_k] = two_lowest_mse
+
+three_hyp_mse = dict()
+three_lowest_mse = three_mse_values[0]
+three_lowest_k = 1
+for k, mse in enumerate(three_mse_values):
+    if mse < three_lowest_mse:
+        three_lowest_mse = mse 
+        three_lowest_k = k+1  #error when += 1 and mse doesn't consistenly decrease
+three_hyp_mse[three_lowest_k] = three_lowest_mse
+
+## Cross-validation
+import numpy as np
+import pandas as pd
+
+dc_listings = pd.read_csv("dc_airbnb.csv")
+stripped_commas = dc_listings['price'].str.replace(',', '')
+stripped_dollars = stripped_commas.str.replace('$', '')
+dc_listings['price'] = stripped_dollars.astype('float')
+
+# Shuffle the ordering of the rows in dc_listings
+re_index = np.random.permutation(dc_listings.index)
+dc_listings = dc_listings.reindex(re_index)
+
+# To avoid SettingWithCopy warning, make sure to include .copy() whenever you perform operations on a dataframe.
+split_one = dc_listings.iloc[0:1862].copy()
+split_two = dc_listings.iloc[1862:].copy()
+
+# Find the avg error when switch the training and test sets 
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.metrics import mean_squared_error
+
+train_one = split_one
+test_one = split_two
+train_two = split_two
+test_two = split_one
+
+knn_one = KNeighborsRegressor() #default algorithm auto, n_neighbors 5
+knn_one.fit(train_one[['accommodates']], train_one['price'])   #df[col] return 1xn pd.Series while df[[col]] returns pd.DataFrame; ?error when dim of the 2nd argument is nx1? 
+predicted_one = knn_one.predict(test_one[['accommodates']])
+iteration_one_rmse = np.sqrt(mean_squared_error(test_one['price'], predicted_one))
+
+knn_two = KNeighborsRegressor()
+knn_two.fit(train_two[['accommodates']], train_two['price'])
+predicted_two = knn_two.predict(test_two[['accommodates']])
+iteration_two_rmse = np.sqrt(mean_squared_error(test_two['price'], predicted_two))
+
+avg_rmse = np.mean([iteration_one_rmse, iteration_two_rmse])
+
+#k-fold crosss-validation
+# add a new column 'fold'
+dc_listings.loc[dc_listings.index[0:745], 'fold'] = 1 # Select a subset of a dataframe's index by position (not label) like so: df.index[0:100]
+dc_listings.loc[dc_listings.index[745:1490], 'fold'] = 2
+dc_listings.loc[dc_listings.index[1490:2234], 'fold'] = 3
+dc_listings.loc[dc_listings.index[2234:2978], 'fold'] = 4
+dc_listings.loc[dc_listings.index[2978:3723], 'fold'] = 5
+    
+print(dc_listings['fold'].value_counts())
+print("\n Num of missing values: ", dc_listings['fold'].isnull().sum())

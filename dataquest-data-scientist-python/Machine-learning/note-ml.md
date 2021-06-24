@@ -43,3 +43,15 @@ dist = distance.euclidean(first_listing, second_listing)
 ##### Hyperparameter Optimization
 - In other words, we're impacting how the model performs without trying to change the data that's used.
 - Values that affect the behavior and performance of a model that are unrelated to the data that's used are referred to as hyperparameters. 
+- Workflow:
+    - select relevant features to use for predicting the target column.
+    - use grid search to find the optimal hyperparameter value for the selected features.
+    - evaluate the model's accuracy and repeat the process.
+
+##### Cross-validation
+- Holdout validation technique
+- When splitting the data set, don't forget to set a copy of it using .copy() to ensure you don't get any unexpected results later on:
+    - SettingWithCopy warning: https://www.dataquest.io/blog/settingwithcopywarning/
+- Holdout validation is better than train/test validation because the model isn't repeatedly biased towards a specific subset of the data, both models that are trained only use half the available data. 
+- K-fold cross validation, on the other hand, takes advantage of a larger proportion of the data during training while still rotating through different subsets of the data to avoid the issues of train/test validation.
+- 
