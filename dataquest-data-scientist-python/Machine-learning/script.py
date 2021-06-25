@@ -207,3 +207,13 @@ mses = cross_val_score(knn,
                 scoring='neg_mean_squared_error',
                 cv = kf)
 avg_rmse = np.mean(np.sqrt(np.absolute(mses)))
+
+## Calculus for Machine Learning
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(0, 3, num=100)        # generate a sequence
+y = -(x**2) + 3*x - 1
+
+plt.plot(x, y)
+plt.show()

@@ -73,3 +73,17 @@ cross_val_score(estimator, X, Y, scoring=None, cv=None)
 
 #### Calculus for Machine Learning
 ##### Understanding linear and nonlinear functions
+-  A model, represented by mathematical function, approximates the underlying function that describes how the features are related to the target attribute -> making predictions is computationally cheap.
+- Instantaneous rate of change: slope at a particular point
+
+##### Understanding limits
+- Calculatating limits in SymPy library:
+```py
+import sympy
+x,y = sympy.symbols('x y') #declare the variables we want to be treated as symbols
+limit_one = sympy.limit((-x2**2+3*x2-1+1)/(x2-3), x2, 2.9)
+```
+##### Find extreme points
+- The process of finding a function's derivative is known as differentiation.
+- [Differentiation.pdf]
+
