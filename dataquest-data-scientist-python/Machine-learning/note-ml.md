@@ -1,5 +1,4 @@
-##### Introduction to k-nearest neighbor
-
+#### Machine learning fundementals 
 ##### Evaluating model performance
 - Error metric quantifies how inaccurate our predictions were compared to the actual values
 - Mean absolute error
@@ -54,4 +53,23 @@ dist = distance.euclidean(first_listing, second_listing)
     - SettingWithCopy warning: https://www.dataquest.io/blog/settingwithcopywarning/
 - Holdout validation is better than train/test validation because the model isn't repeatedly biased towards a specific subset of the data, both models that are trained only use half the available data. 
 - K-fold cross validation, on the other hand, takes advantage of a larger proportion of the data during training while still rotating through different subsets of the data to avoid the issues of train/test validation.
-- 
+- While the average RMSE value was approximately 129, the RMSE values ranged from 102 to 164+. This large amount of variability between the RMSE values means that we're either using a poor model or a poor evaluation criteria (or a bit of both!).
+- KFold():
+```py
+from sklearn.model_selection import KFold
+kf = KFold(n_splits, shuffle=False, random_state=None)
+```
+- cross_val_score():
+    - estimator is a sklearn model that implements the fit method (e.g. instance of KNeighborsRegressor)
+    - scoring: https://scikit-learn.org/stable/modules/model_evaluation.html#common-cases-predefined-values
+    - cv can be: an instance of the KFold class or an integer representing the number of folds.
+```py
+from sklearn.model_selection import cross_val_score
+cross_val_score(estimator, X, Y, scoring=None, cv=None)
+```
+- Through lots of trial and error, data scientists have converged on 10 as the standard k value.
+- Through CV: the standard deviation of the RMSE values can be a proxy for a model's **variance** while the average RMSE is a proxy for a model's **bias**.
+- A mathematical model is usually an equation that can exist without the original data, which isn't true with k-nearest neighbors. Bias-variance tradeoff is importanct when working with mathematical models in particular.
+
+#### Calculus for Machine Learning
+##### Understanding linear and nonlinear functions

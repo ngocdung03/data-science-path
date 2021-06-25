@@ -174,3 +174,36 @@ dc_listings.loc[dc_listings.index[2978:3723], 'fold'] = 5
     
 print(dc_listings['fold'].value_counts())
 print("\n Num of missing values: ", dc_listings['fold'].isnull().sum())
+
+# Train and evaluate on each fold
+import numpy as np
+fold_ids = [1,2,3,4,5]
+
+def train_and_validate(df, folds):
+    knn = KNeighborsRegressor()
+    rmses = []
+    for fold in range(1, folds+1):
+        train = df[df['fold'] != fold]
+        test = df[df['fold'] == fold]
+        knn.fit(train[['accommodates']], train['price'])
+        prediction = knn.predict(test[['accommodates']])
+        mse = mean_squared_error(test['price'], prediction)
+        rmse = mse**(1/2)
+        rmses.append(rmse)
+    avg_rmse = np.mean(rmses)
+    return rmses, avg_rmse
+
+rmses = train_and_validate(dc_listings, 5)[0]
+avg_rmse = train_and_validate(dc_listings, 5)[1]
+
+# Applying KFold and cross_val_score in sklearn
+from sklearn.model_selection import cross_val_score, KFold
+
+kf = KFold(n_splits=5, shuffle=True, random_state=1)
+knn = KNeighborsRegressor()
+mses = cross_val_score(knn, 
+                dc_listings[['accommodates']], 
+                dc_listings['price'],
+                scoring='neg_mean_squared_error',
+                cv = kf)
+avg_rmse = np.mean(np.sqrt(np.absolute(mses)))
