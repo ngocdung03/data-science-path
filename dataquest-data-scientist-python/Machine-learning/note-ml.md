@@ -86,4 +86,5 @@ limit_one = sympy.limit((-x2**2+3*x2-1+1)/(x2-3), x2, 2.9)
 ##### Find extreme points
 - The process of finding a function's derivative is known as differentiation.
 - [Differentiation.pdf]
-
+- Critical points: can be extreme values or not, or relative minimum/maximum
+- Sign chart for identifying sign of slope: http://www.rasmus.is/uk/t/F/Su53k02.htm
