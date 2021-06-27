@@ -95,6 +95,13 @@ limit_one = sympy.limit((-x2**2+3*x2-1+1)/(x2-3), x2, 2.9)
 ##### Linear algebra for machine learning
 - Systems of linear equations can be solved using linear algebra using a variation of arithmetic elimination called Gaussian elimination.
 - Matrix can represent a linear system compactly. *Algebra* is a set of rules for manipulating that representation. We need to rerrange each functions into the *general form*.
+```py
+#Because we'll be performing operations using the values in this matrix, we need to set the type to float32 to preserve precision.
+matrix_one = np.asarray([
+    [30, -1, -1000],
+    [50, -1, -100]  
+], dtype=np.float32)
+```
 - Augmented matrix
 - To preserve the relationships in the linear system, we can only use row operations: swap rows, multiply by a nonzero constant, add rows. Note that you can't multiply or divide by other rows.
 ```py
@@ -111,4 +118,21 @@ matrix[1] = 0.5*matrix[2] + matrix[1] + matrix[3]
     ```py
     plt.quiver(0, 0, 1, 2, angles='xy', scale_units='xy', scale=1)
     ```
-    
+- Vector in numpy
+```py
+vector_one = np.asarray([
+    [1],
+    [2],
+    [1]
+], dtype=np.float32)
+```
+- Dot product: one of the two vectors need to be represented as a row vector while the other a column vector
+```py
+dot_product = np.dot(vector_one[:,0], vector_two) 
+```
+- Being able to scale vectors using scalar multiplication then adding or subtracting these scaled vectors is known as *linear combination*. 
+- To multiply a matrix by a vector, the number of columns in the matrix needs to match the number of rows in the vector.
+- Transpose matrix:
+    - Distribute for sum operation: (A+B)^T = A^T + B^T
+    - Distribute for multiplication: (AB)^T = B^T*A^T  #note the order
+    - np.transpose()
