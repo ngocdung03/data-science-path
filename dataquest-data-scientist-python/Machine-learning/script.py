@@ -217,3 +217,10 @@ y = -(x**2) + 3*x - 1
 
 plt.plot(x, y)
 plt.show()
+
+## Linear algebra for machine learning
+#Because we'll be performing operations using the values in this matrix, we need to set the type to float32 to preserve precision.
+matrix_one = np.asarray([
+    [30, -1, -1000],
+    [50, -1, -100]  
+], dtype=np.float32)

@@ -87,4 +87,28 @@ limit_one = sympy.limit((-x2**2+3*x2-1+1)/(x2-3), x2, 2.9)
 - The process of finding a function's derivative is known as differentiation.
 - [Differentiation.pdf]
 - Critical points: can be extreme values or not, or relative minimum/maximum
-- Sign chart for identifying sign of slope: http://www.rasmus.is/uk/t/F/Su53k02.htm
+- Sign chart for identifying direction of slope: http://www.rasmus.is/uk/t/F/Su53k02.htm
+- Eg: f(x) = x^3 - x^2
+    - Derivative: 0, 2/3
+    - Through sign chart: relative minimum: 2/3, relative maximum: 0
+
+##### Linear algebra for machine learning
+- Systems of linear equations can be solved using linear algebra using a variation of arithmetic elimination called Gaussian elimination.
+- Matrix can represent a linear system compactly. *Algebra* is a set of rules for manipulating that representation. We need to rerrange each functions into the *general form*.
+- Augmented matrix
+- To preserve the relationships in the linear system, we can only use row operations: swap rows, multiply by a nonzero constant, add rows. Note that you can't multiply or divide by other rows.
+```py
+# Swap the second row (at index value 1) with the first row (at index value 0).
+matrix = matrix[[1,0]]
+matrix[1] = 0.5*matrix[2] + matrix[1] + matrix[3]
+```
+- To find the solutions of a matrix:
+    - First, rearrange the matrix into *echelon form* - the values on the diagonal locations are all equal to 1 and the values below the diagonal are all equal to 0. [Echelon rearrangement.jpeg]
+    - Second, rearrange the matrix into *row reduced echelon form*
+- Generally, the word vector refers to the column vector
+- Can visualize vectors in matplotlib using the pyplot.quiver()
+    - We also need to set the angles and scale_units parameters to xy and the scale parameter to 1. Setting angles to 'xy' lets matplotlib know we want the angle of the vector to be between the points we specified. The scale_units and scale parameters lets us specify custom scaling parameters for the vectors. 
+    ```py
+    plt.quiver(0, 0, 1, 2, angles='xy', scale_units='xy', scale=1)
+    ```
+    
