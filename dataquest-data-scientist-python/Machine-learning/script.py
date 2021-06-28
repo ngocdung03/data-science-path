@@ -219,3 +219,41 @@ plt.plot(x, y)
 plt.show()
 
 ## Linear algebra for machine learning
+# Calculate inverse 2x2 matrix
+matrix_a = np.asarray([
+    [1.5, 3],
+    [1, 4]
+])
+
+def matrix_inverse_two(mat):
+    det = mat[0, 0]*mat[1, 1] - mat[0, 1]*mat[1, 0]   
+    if det ==0:
+        raise ValueError("The matrix isn't invertible")
+    else:
+        inv_mat =  np.asarray([
+    [mat[1,1], -mat[0,1]],
+    [-mat[1,0], mat[0,0]]  
+], dtype=np.float32)
+        return np.dot(1/det,inv_mat)         #error (if 1/det)*inv_mat?
+
+inverse_a = matrix_inverse_two(matrix_a)
+i_2 = np.dot(inverse_a, matrix_a)
+
+## Linear regression for machine learning
+import pandas as pd
+data = pd.read_csv('AmesHousing.txt', delimiter='\t')
+train = data[0:1460]   #selectinf first 1460 rows
+test = data[1460:]
+train.info()
+target = 'SalePrice'
+
+# Plot some vars vs. target var
+import matplotlib.pyplot as plt
+fig = plt.figure(figsize=[7, 15])
+ax1 = fig.add_subplot(3, 1, 1)
+ax2 = fig.add_subplot(3, 1, 2)
+ax3 = fig.add_subplot(3, 1, 3)
+
+train.plot('Garage Area', 'SalePrice', ax=ax1, kind='scatter')
+train.plot('Gr Liv Area', 'SalePrice', ax=ax2, kind='scatter')
+train.plot('Overall Cond', 'SalePrice', ax=ax3, kind='scatter')

@@ -136,3 +136,27 @@ dot_product = np.dot(vector_one[:,0], vector_two)
     - Distribute for sum operation: (A+B)^T = A^T + B^T
     - Distribute for multiplication: (AB)^T = B^T*A^T  #note the order
     - np.transpose()
+- To solve for vector x: Ax = b   (b is also vector)
+    - Remember Ix = x (I is identity matrix)
+    - Transform and convert A into the identity matrix  AA^-1 = I
+    - Multiply A^-1 on both sides
+    - [Inverse matrix.jpeg]
+    - np.identity(): creating identity matrix
+    - np.linalg.inv(): find inverse matrix
+    - Because IA = A, similar to solve for matrix (?)
+- [Determinant of higher dim square matrix.jpeg]
+- [Inverse 3x3 matrix.jpeg]
+- 2 ways to solve for Ax = b
+    - Gaussian elimination
+    - Multiplying both sides to inverse of A
+- Not all systems of equations have a solution and these systems are inconsistent. If the determinant of the matrix is equal to 0, the matrix is *singular*, or contains no inverse.
+    - the solution set for a linear system doesn't exist
+    - the solution set for a linear system isn't just a single vector
+    - b is equal to 0
+- linear systems where the constants vector (b) doesn't contain all zeroes: *nonhomogenous systems*.
+- On the other hand, when the constant vector is equal to the zero vector: *homogenous system* ->  *always have a trivial solution* - the zero vector.
+    - We're interested in determining if infinitely many solutions exist or not using Gaussian elimination. 
+    - If after echelon reduction, the last row contain 0 = a, there is no solution.
+    - On the other hand, when the solution is a solution space, it's common to rewrite it into *parametric vector form*. Eg: x = x3.[4/3, 0, 1]
+- For a *nonsquare*, nonhomogenous systems, there are 2 possible solutions: no solution, infinitely many solutions (solution space). 
+
