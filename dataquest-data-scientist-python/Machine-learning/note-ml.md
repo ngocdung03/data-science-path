@@ -160,3 +160,27 @@ dot_product = np.dot(vector_one[:,0], vector_two)
     - On the other hand, when the solution is a solution space, it's common to rewrite it into *parametric vector form*. Eg: x = x3.[4/3, 0, 1]
 - For a *nonsquare*, nonhomogenous systems, there are 2 possible solutions: no solution, infinitely many solutions (solution space). 
 
+##### Linear regression for machine learning
+- K-nearest neighbors is known as an *instance-based learning* algorithm because it relies completely on previous instances to make predictions. It doesn't try to understand or capture the relationship between the feature columns and the target column. -> doesn't scale well to medium and larger datasets.
+- Parametric machine learning approaches: work by making **assumptions** about the relationship between the features and the target column
+- To find the optimal parameters for a linear regression model, we want to optimize the model's residual sum of squares (or RSS).
+- RSS seems very similar to the calculation for MSE (mean squared error).
+- Code for select integer and float columns in dataset:
+```py
+train.select_dtypes(include=['int', 'float'])
+```
+- AmesHousing.txt data documentation: https://s3.amazonaws.com/dq-content/307/data_description.txt
+- Workflow...
+- The problem of choosing a set of values that minimize or maximize another function is known as an *optimization problem*.
+- Gradient descent: iteratively trying different parameter values until the model with the lowest mean squared error is found.
+    - select initial values for the parameter: a1
+    - repeat until convergence (usually implemented with a max number of iterations):
+        - calculate the error (MSE) of model that uses current parameter value: MSE(a1)=1n∑(^yi−yi)^2
+        - calculate the derivative of the error (MSE) at the current parameter value: (d/da1)MSE(a1)
+        - update the parameter value by subtracting the derivative times a constant (α, called the learning rate): a1:=a1−α(d/da1)MSE(a1)
+    - Selecting an appropriate initial parameter and learning rate will reduce the number of iterations required to converge, and is part of hyperparameter optimization.
+- Cost function/ loss function
+- [Derivative of MSE.jpeg]
+- [Derivative of multiple parameter MSE.jpeg]
+
+

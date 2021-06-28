@@ -47,6 +47,7 @@ knn.fit(train_df[['accommodates', 'bathrooms']], train_df['price'])
 predictions = knn.predict(test_df[['accommodates', 'bathrooms']])
 
 # Calculating MSE and RMSE by sklearn
+from sklearn.metrics import mean_squared_error
 two_features_mse = mean_squared_error(test_df['price'], predictions)
 two_features_rmse = np.sqrt(two_features_mse)
 print(two_features_mse)
@@ -257,3 +258,148 @@ ax3 = fig.add_subplot(3, 1, 3)
 train.plot('Garage Area', 'SalePrice', ax=ax1, kind='scatter')
 train.plot('Gr Liv Area', 'SalePrice', ax=ax2, kind='scatter')
 train.plot('Overall Cond', 'SalePrice', ax=ax3, kind='scatter')
+
+print(train[['Garage Area', 'Gr Liv Area', 'Overall Cond', 'SalePrice']].corr())
+
+# Training model
+from sklearn.linear_model import LinearRegression
+# lr = LinearRegression()
+model = LinearRegression().fit(train[['Gr Liv Area']], train['SalePrice'])  #error if train['Gr Liv Area'] - ValueError: Found input variables with inconsistent numbers of samples: 
+a1 = model.coef_
+a0 = model.intercept_
+
+# Predict and evaluate
+import numpy as np
+from sklearn.metrics import mean_squared_error
+
+lr = LinearRegression()
+lr.fit(train[['Gr Liv Area']], train['SalePrice'])
+prediction_train = lr.predict(train[['Gr Liv Area']])
+prediction_test = lr.predict(test[['Gr Liv Area']])
+train_rmse = np.sqrt(mean_squared_error(train['SalePrice'], prediction_train))
+test_rmse = np.sqrt(mean_squared_error(test['SalePrice'], prediction_test))
+
+## Feature selection
+import pandas as pd
+data = pd.read_csv('AmesHousing.txt', delimiter="\t")
+train = data[0:1460]
+test = data[1460:]
+#train.info()
+# Select integer and float columns
+numerical_train = train.select_dtypes(include=['int', 'float'])
+# Drop meaningless columns
+numerical_train = numerical_train.drop(columns = ['PID', 'Year Built', 'Year Remod/Add', 'Garage Yr Blt', 'Mo Sold', 'Yr Sold'])  # or ([], axis=1)
+# Calculate number of missing values into a series object
+null_series = numerical_train.isnull().sum()
+# Columns with no missing values
+full_cols_series = null_series[null_series==0] 
+
+# Calculate correlation values
+train_subset = train[full_cols_series.index]
+sorted_corrs = abs(train_subset.corr()['SalePrice']).sort_values()
+
+# Diagnosing collinearity
+# To avoid the risk of information overload, we can generate a correlation matrix heatmap
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+strong_corrs = sorted_corrs[sorted_corrs>0.3]
+corrmat = train_subset[strong_corrs.index].corr()
+sns.heatmap(corrmat)
+plt.show()
+
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import numpy as np
+
+# There are 2 pairs that are strongly correlated. Because Gr Liv Area and Garage Area are continuous variables that capture more nuance, let's drop the TotRms AbvGrd and Garage Cars
+final_corr_cols = strong_corrs.drop(['Garage Cars', 'TotRms AbvGrd'])
+
+# Confirm and filter that the test set contains no missing values
+print(test[final_corr_cols.index].info())
+clean_test = test[final_corr_cols.index].dropna()
+
+features = final_corr_cols.drop(['SalePrice']).index
+target = 'SalePrice'
+
+model = LinearRegression().fit(train[features], train[target])
+train_predictions = model.predict(train[features])
+train_rmse = np.sqrt(mean_squared_error(train[target], train_predictions))
+
+test_predictions = model.predict(clean_test[features])
+test_rmse = np.sqrt(mean_squared_error(clean_test[target], test_predictions))  
+
+## Training and testing after removing features with low variance
+# Rescaling
+unit_train = (train[features] - train[features].min())/(train[features].max() - train[features].min())
+print(unit_train.max())   # should be 1
+print(unit_train.min())   # should be 0
+
+print(unit_train.var())
+features = features.drop('Open Porch SF')
+
+model = LinearRegression().fit(train[features], train[target])
+train_predictions = model.predict(train[features])
+train_rmse_2 = np.sqrt(mean_squared_error(train[target], train_predictions))
+
+test_predictions = model.predict(clean_test[features])
+test_rmse_2 = np.sqrt(mean_squared_error(clean_test[target], test_predictions))
+
+# Gradient descent
+def derivative(a1, xi_list, yi_list):
+    deriv = 0
+    for i in range(len(xi_list)):
+        deriv += (2/len(xi_list))*xi_list[i]*(a1*xi_list[i] - yi_list[i])
+    return deriv
+
+def gradient_descent(xi_list, yi_list, max_iterations, alpha, a1_initial):
+    a1_list = [a1_initial]
+
+    for i in range(0, max_iterations):
+        a1 = a1_list[i]
+        deriv = derivative(a1, xi_list, yi_list)
+        a1_new = a1 - alpha*deriv
+        a1_list.append(a1_new)
+    return(a1_list)
+
+param_iterations = gradient_descent(train['Gr Liv Area'], train['SalePrice'], 20, .0000003, 150)
+final_param = param_iterations[-1]
+
+# Multiple paramter gradient descent
+def a1_derivative(a0, a1, xi_list, yi_list):
+    len_data = len(xi_list)
+    error = 0
+    for i in range(0, len_data):
+        error += xi_list[i]*(a0 + a1*xi_list[i] - yi_list[i])
+    deriv = 2*error/len_data
+    return deriv
+
+def a0_derivative(a0, a1, xi_list, yi_list):
+    len_data = len(xi_list)
+    error = 0
+    for i in range(len_data):
+        error += a0 + a1*xi_list[i] - yi_list[i]
+    deriv = (2/len_data)*error
+    return deriv
+
+def gradient_descent(xi_list, yi_list, max_iterations, alpha, a1_initial, a0_initial):
+    a1_list = [a1_initial]
+    a0_list = [a0_initial]
+
+    for i in range(0, max_iterations):
+        a1 = a1_list[i]
+        a0 = a0_list[i]
+        
+        a1_deriv = a1_derivative(a0, a1, xi_list, yi_list)
+        a0_deriv = a0_derivative(a0, a1, xi_list, yi_list)
+        
+        a1_new = a1 - alpha*a1_deriv
+        a0_new = a0 - alpha*a0_deriv
+        
+        a1_list.append(a1_new)
+        a0_list.append(a0_new)
+    return(a0_list, a1_list)
+
+# Uncomment when ready.
+a0_params, a1_params = gradient_descent(train['Gr Liv Area'], train['SalePrice'], 20, .0000003, 150, 1000)
+
