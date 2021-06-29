@@ -464,3 +464,109 @@ for col in text_cols:
 # Create a new feature that are math operated result of other features
 train['years_until_remod'] = train['Year Remod/Add'] - train['Year Built']
 
+# Treating missing values
+import pandas as pd
+
+data = pd.read_csv('AmesHousing.txt', delimiter="\t")
+train = data[0:1460]
+test = data[1460:]
+
+train_null_counts = train.isnull().sum()
+df_missing_values = train[train_null_counts[(train_null_counts>0) &
+                                            (train_null_counts<584)].index]
+print(df_missing_values.isnull().sum())
+print(df_missing_values.info())
+
+# Missing value imputation (for numerical features)
+float_cols = df_missing_values.select_dtypes(include=['float'])
+float_cols = float_cols.fillna(float_cols.mean())
+float_cols.isnull().sum()
+
+
+## Logistic regression
+import pandas as pd
+import matplotlib.pyplot as plt
+
+admissions = pd.read_csv('admissions.csv')
+plt.scatter(admissions['gpa'], admissions['admit'])
+plt.show()
+
+from sklearn.linear_model import LinearRegression
+linear_model = LinearRegression()
+linear_model.fit(admissions[["gpa"]], admissions["admit"])
+
+# Return probability for outcome=1
+pred_probs = logistic_model.predict_proba(admissions[['gpa']])
+plt.scatter(admissions['gpa'], pred_probs[:,1])  #linear relationship expected
+
+# Label prediction
+fitted_labels = logistic_model.predict(admissions[['gpa']])
+plt.scatter(admissions['gpa'], fitted_labels)
+
+# Evaluation
+labels = model.predict(admissions[['gpa']])
+admissions['predicted_label'] = labels
+print(admissions['predicted_label'].value_counts())
+print(admissions.head(5))
+
+admissions['actual_label'] = admissions['admit']
+matches = admissions['predicted_label'] == admissions['actual_label']
+correct_predictions = admissions[matches == True]
+correct_predictions.head(5)
+accuracy = len(correct_predictions)/len(admissions)
+
+true_positives = len(admissions[(admissions['predicted_label']==1) & 
+                                (admissions['actual_label']==1)])
+true_negatives = len(admissions[(admissions['predicted_label']==0) & 
+                                (admissions['actual_label']==0)])
+false_negatives = len(admissions[(admissions['predicted_label']==0) &
+                                 (admissions['actual_label']==1)])
+sensitivity = true_positives/(true_positives+false_negatives)
+false_positives = len(admissions[(admissions['predicted_label']==1) &
+                                 (admissions['actual_label']==0)])
+specificity = true_negatives/(false_positives+true_negatives)
+
+## Multiclass classification
+import pandas as pd
+cars = pd.read_csv("auto.csv")
+unique_regions = cars['origin'].unique()
+
+# Get dummies
+dummy_cylinders = pd.get_dummies(cars["cylinders"], prefix="cyl")
+cars = pd.concat([cars, dummy_cylinders], axis=1)
+                 
+dummy_years = pd.get_dummies(cars['year'], prefix='year')
+cars = pd.concat([cars, dummy_years], axis=1)
+cars = cars.drop(['cylinders', 'year'], axis=1)
+print(cars.head(5))
+
+# Make train - test sets
+shuffled_rows = np.random.permutation(cars.index)
+shuffled_cars = cars.iloc[shuffled_rows]
+
+train = shuffled_cars.iloc[:round(len(cars)*0.7)]
+test = shuffled_cars.iloc[round(len(cars)*0.7):]
+
+# Training
+from sklearn.linear_model import LogisticRegression
+
+unique_origins = cars["origin"].unique()
+unique_origins.sort()
+
+models = {}
+features = [c for c in train.columns if c.startswith('cyl') or c.startswith('year')]
+X = cars[features]
+for value in unique_origins:
+    y = cars['origin']==value
+    model = LogisticRegression().fit(X, y)
+    models[value] = model
+
+# Evaluate
+testing_probs = pd.DataFrame(columns=unique_origins)
+
+for model in models:   #can be for origin in unique_origins
+    prob = models[model].predict_proba(test[features])[:,1]
+    testing_probs[model] = prob
+
+predicted_origins = testing_probs.idxmax(axis=1) #return a series where each value corresponds to the column or where the maximum value occurs for that observation
+

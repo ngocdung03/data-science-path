@@ -202,6 +202,8 @@ train.select_dtypes(include=['int', 'float'])
 train['Utilities'] = train['Utilities'].astype('category')
 ```
 - Transform categorical vars into dummies: pandas.get_dummies()
+    - if we set the prefix parameter to cyl, Pandas pre-pends the column names to match the style we'd like: `dummy_df = pd.get_dummies(cars["cylinders"], prefix="cyl")`
+dummy_df = pd.get_dummies(cars["cylinders"], prefix="cyl")
 - Approaches for missing values:
     - Remove rows containing missing values for specific columns
         - Pro: Rows containing missing values are removed, leaving only clean data for modeling
@@ -210,5 +212,25 @@ train['Utilities'] = train['Utilities'].astype('category')
         - Pro: Missing values are replaced with potentially similar estimates, preserving the rest of the observation in the model.
         - Con: Depending on the approach, we may be adding noisy data for the model to learn
         - We'll focus on columns that contain at least 1 missing value but less than 365 missing values (or 25% of the number of rows in the training set). Many people instead use a 50% cutoff 
-
+- Imputation for numerical features: pd.DataFrame.fillna()
  
+##### Machine Learning in Python: Intermediate
+- Logistic regression: While a linear regression model outputs a real number as the label, a logistic regression model outputs a probability value. In binary classification, if the probability value is larger than a certain threshold probability, we assign the label for that row to 1 or 0. This threshold probability is something we select. 
+- [Logistic regression mechanism.docx]
+- Return the predicted probability for each row in the training data: predict_proba method
+```py
+probabilities = logistic_model.predict_proba(admissions[["gpa"]])
+# Probability that the row belongs to label `0`.
+probabilities[:,0]
+# Probabililty that the row belongs to label `1`.
+probabilities[:,1]
+```
+- Accuracy: # of correctly predicted/ # of observation
+- *Discrimination threshold*
+- Instead of accuracy, we should evaluate a classification model by a confusion matrix.
+    - Sensitivity: How effective is this model at identifying positive outcomes?
+    - Specificity: How effective is this model at identifying negative outcomes?
+- Multiclass classification:
+    - The one-versus-all method is a technique where we choose a single category as the Positive case and group the rest of the categories as the False case
+        - We're essentially converting an n-class classification problem into n binary classification problems.
+        - A probability value will be returned from each model. For each observation, we choose the label corresponding to the model that predicted the highest probability. 
