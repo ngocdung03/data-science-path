@@ -180,7 +180,35 @@ train.select_dtypes(include=['int', 'float'])
         - update the parameter value by subtracting the derivative times a constant (α, called the learning rate): a1:=a1−α(d/da1)MSE(a1)
     - Selecting an appropriate initial parameter and learning rate will reduce the number of iterations required to converge, and is part of hyperparameter optimization.
 - Cost function/ loss function
-- [Derivative of MSE.jpeg]
-- [Derivative of multiple parameter MSE.jpeg]
+- [Gradient descent of MSE.jpeg]
+- [Gradient descent of multiple parameter MSE.jpeg]
+- Ordinary least squares OLS: rovides a clear formula (*closed form solution*) to directly calculate the optimal parameter values that minimize the cost function.
+    - Optimal vector a: a = (X^T.X)^-1.X^T.y
+    - scikit-learn uses OLS under the hood when you call fit() on a LinearRegression instance.
+    - [Matrix form of LR model.jpeg]  - Note the first column with all 1
+    - [Cost function OLS.jpeg]
+    - Derivatives of the cost function: https://eli.thegreenplace.net/2015/the-normal-equation-and-matrix-calculus/
+    - [From derivative of cost function to OLS.jpeg]
+- OLS is commonly used when the number of elements in the dataset (and therefore the matrix that's inverted) is less than a few million elements. On larger datasets, gradient descent is used because it's much more flexible. For many practical problems, we can set a threshold accuracy value (or a set number of iterations) and use a "good enough" solution.
+- Processing and transforming features
+- Feature engineering: the process of processing and creating new features. 
+- Some issues of non-missing features:
+    - the column is not numerical (e.g. a zoning code represented using text)
+    - the column is numerical but not ordinal (e.g. zip code values)
+    - the column is numerical but isn't representative of the type of relationship with the target column (e.g. year values)
+- Convert string column (or any other type) that contains no missing using pd.Series.astype().
+    - We need to use the .cat accessor followed by the .codes property to actually access the underlying numerical representation of a column (instead of the string label): `train['Utilities'].cat.codes`
+```py
+train['Utilities'] = train['Utilities'].astype('category')
+```
+- Transform categorical vars into dummies: pandas.get_dummies()
+- Approaches for missing values:
+    - Remove rows containing missing values for specific columns
+        - Pro: Rows containing missing values are removed, leaving only clean data for modeling
+        - Con: Entire observations from the training set are removed, which can reduce overall prediction accuracy
+    - Impute (or replace) missing values using a descriptive statistic from the column
+        - Pro: Missing values are replaced with potentially similar estimates, preserving the rest of the observation in the model.
+        - Con: Depending on the approach, we may be adding noisy data for the model to learn
+        - We'll focus on columns that contain at least 1 missing value but less than 365 missing values (or 25% of the number of rows in the training set). Many people instead use a 50% cutoff 
 
-
+ 

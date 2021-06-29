@@ -400,6 +400,67 @@ def gradient_descent(xi_list, yi_list, max_iterations, alpha, a1_initial, a0_ini
         a0_list.append(a0_new)
     return(a0_list, a1_list)
 
-# Uncomment when ready.
 a0_params, a1_params = gradient_descent(train['Gr Liv Area'], train['SalePrice'], 20, .0000003, 150, 1000)
+
+## Original least squares
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+data = pd.read_csv('AmesHousing.txt', delimiter="\t")
+train = data[0:1460]
+test = data[1460:]
+
+features = ['Wood Deck SF', 'Fireplaces', 'Full Bath', '1st Flr SF', 'Garage Area',
+       'Gr Liv Area', 'Overall Qual']
+X = train[features]
+X['bias'] = 1
+X = X[['bias']+features]  #rearrange so that 'bias' stands first
+y = train['SalePrice']
+
+first_term = np.linalg.inv(
+        np.dot(
+            np.transpose(X),
+            X
+        )
+    )
+second_term = np.dot(
+    np.transpose(X),
+    y
+)
+
+ols_estimation = np.dot(first_term, second_term)
+
+## Processing and transforming features
+import pandas as pd
+
+data = pd.read_csv('AmesHousing.txt', delimiter="\t")
+train = data[0:1460]
+test = data[1460:]
+
+train_null_counts = train.isnull().sum()
+#print(train_null_counts)
+
+no_mv = train_null_counts[train_null_counts==0]  #columns with no missing
+df_no_mv = train[no_mv.index] 
+
+# Convert all text columns to categorical data type
+text_cols = df_no_mv.select_dtypes(include=['object']).columns
+
+print('Number of categories')
+for col in text_cols:
+    train[col] = train[col].astype('category')
+    print(col+":", len(train[col].unique()))
+    
+train['Utilities'].cat.codes.value_counts()
+
+# Dummy coding
+dummy_cols = pd.DataFrame()
+for col in text_cols:
+    col_dummies = pd.get_dummies(train[col])
+    train = pd.concat([train, col_dummies], axis=1)
+    del train[col]
+
+# Create a new feature that are math operated result of other features
+train['years_until_remod'] = train['Year Remod/Add'] - train['Year Built']
 
