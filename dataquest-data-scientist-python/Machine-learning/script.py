@@ -570,3 +570,112 @@ for model in models:   #can be for origin in unique_origins
 
 predicted_origins = testing_probs.idxmax(axis=1) #return a series where each value corresponds to the column or where the maximum value occurs for that observation
 
+## Overfitting
+import pandas as pd
+columns = ["mpg", "cylinders", "displacement", "horsepower", "weight", "acceleration", "model year", "origin", "car name"]
+cars = pd.read_table("auto-mpg.data", delim_whitespace=True, names=columns)
+filtered_cars = cars[cars['horsepower'] != '?'].copy() #  If you run the code locally in Jupyter Notebook or Jupyter Lab, you'll notice a SettingWithCopy Warning. It's considered good practice to include .copy() whenever you perform operations on a dataframe.
+filtered_cars['horsepower'] = filtered_cars['horsepower'].astype('float')
+
+# Function for computing bias and variance
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import numpy as np
+import matplotlib.pyplot as plt
+
+def train_and_test(cols):
+    model = LinearRegression().fit(filtered_cars[cols], filtered_cars['mpg'])
+    predict = model.predict(filtered_cars[cols])
+    variance = np.var(predict)
+    mse = mean_squared_error(predict, filtered_cars['mpg'])
+    return(mse, variance)
+
+cyl_mse, cyl_var = train_and_test(['cylinders'])
+weight_mse, weight_var = train_and_test(['weight'])
+three_mse, three_var = train_and_test(['cylinders', 'displacement', 'horsepower'])
+four_mse, four_var = train_and_test(['cylinders', 'displacement', 'horsepower', 'weight'])
+
+# Function for computing the cross validation error
+from sklearn.model_selection import KFold
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import cross_val_score
+import numpy as np
+
+def train_and_cross_val(cols):
+    model = LinearRegression().fit(filtered_cars[cols], filtered_cars['mpg'])
+    kf = KFold(n_splits=10, shuffle=True, random_state=3)
+    mses = -1*cross_val_score(model,   #can integrate mse in the below loop
+                filtered_cars[cols], 
+                filtered_cars['mpg'],
+                scoring='neg_mean_squared_error',  #this return negative values
+                cv = kf)
+    variances = []
+    for train_index, test_index in kf.split(filtered_cars):
+        train = filtered_cars.iloc[train_index]
+        test = filtered_cars.iloc[test_index]
+        lr = LinearRegression()
+        lr.fit(train[cols], train['mpg'])
+        predictions = lr.predict(test[cols])
+        var = np.var(predictions)
+        variances.append(var)
+    return(np.mean(mses), np.mean(variances))
+two_mse, two_var = train_and_cross_val(["cylinders", "displacement"])
+three_mse, three_var = train_and_cross_val(["cylinders", "displacement", "horsepower"])
+four_mse, four_var = train_and_cross_val(["cylinders", "displacement", "horsepower", "weight"])
+five_mse, five_var = train_and_cross_val(["cylinders", "displacement", "horsepower", "weight", "acceleration"])
+six_mse, six_var = train_and_cross_val(["cylinders", "displacement", "horsepower", "weight", "acceleration", "model year"])
+seven_mse, seven_var = train_and_cross_val(["cylinders", "displacement", "horsepower", "weight", "acceleration","model year", "origin"])
+# Sample solution
+# def train_and_cross_val(cols):
+#     features = filtered_cars[cols]
+#     target = filtered_cars["mpg"]
+    
+#     variance_values = []
+#     mse_values = []
+    
+#     # KFold instance.
+#     kf = KFold(n_splits=10, shuffle=True, random_state=3)
+    
+#     # Iterate through over each fold.
+#     for train_index, test_index in kf.split(features):
+#         # Training and test sets.
+#         X_train, X_test = features.iloc[train_index], features.iloc[test_index]
+#         y_train, y_test = target.iloc[train_index], target.iloc[test_index]
+        
+#         # Fit the model and make predictions.
+#         lr = LinearRegression()
+#         lr.fit(X_train, y_train)
+#         predictions = lr.predict(X_test)
+        
+#         # Calculate mse and variance values for this fold.
+#         mse = mean_squared_error(y_test, predictions)
+#         var = np.var(predictions)
+
+#         # Append to arrays to do calculate overall average mse and variance values.
+#         variance_values.append(var)
+#         mse_values.append(mse)
+   
+#     # Compute average mse and variance values.
+#     avg_mse = np.mean(mse_values)
+#     avg_var = np.mean(variance_values)
+#     return(avg_mse, avg_var)
+
+# Plot the error and variance 
+import matplotlib.pyplot as plt
+        
+mses = [two_mse, three_mse, four_mse, five_mse, six_mse, seven_mse]
+variances = [two_var, three_var, four_var, five_var, six_var, seven_var]
+plt.scatter(range(2,8), mses, color ='red')
+plt.scatter(range(2,8), variances, color ='blue')
+plt.show()
+
+## Clustering basics
+import pandas as pd
+votes = pd.read_csv('114_congress.csv')
+
+# Find how many Senators are in each party
+votes['party'].value_counts()
+
+# Find out the 'average' vote for each bill was
+print(votes.mean())
+

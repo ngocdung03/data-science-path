@@ -55,6 +55,7 @@ dist = distance.euclidean(first_listing, second_listing)
 - K-fold cross validation, on the other hand, takes advantage of a larger proportion of the data during training while still rotating through different subsets of the data to avoid the issues of train/test validation.
 - While the average RMSE value was approximately 129, the RMSE values ranged from 102 to 164+. This large amount of variability between the RMSE values means that we're either using a poor model or a poor evaluation criteria (or a bit of both!).
 - KFold():
+    - Iterate through each fold: `for train_index, test_index in kf.split(data[features]):`
 ```py
 from sklearn.model_selection import KFold
 kf = KFold(n_splits, shuffle=False, random_state=None)
@@ -234,3 +235,10 @@ probabilities[:,1]
     - The one-versus-all method is a technique where we choose a single category as the Positive case and group the rest of the categories as the False case
         - We're essentially converting an n-class classification problem into n binary classification problems.
         - A probability value will be returned from each model. For each observation, we choose the label corresponding to the model that predicted the highest probability. 
+- Overfitting
+    - Bias describes an error that results in bad assumptions about the learning algorithm. 
+    - Variance describes an error that occurs because of the variability of a model's predicted values. If we were given a dataset with 1000 features on each car and used every single feature to train, the result will be a low bias but high variance.
+    - Overfit models tend to capture the noise as well as the signal in a dataset.
+    - A good way to detect if your model is overfitting is to compare the in-sample error and the out-of-sample error
+- Clustering basics
+    - In unsupervised learning, we aren't trying to predict anything. Instead, we're trying to find patterns in data.
