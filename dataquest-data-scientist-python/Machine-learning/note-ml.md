@@ -269,3 +269,34 @@ probabilities[:,1]
 ## Decision Tree
 - One of the major advantages of decision trees is that they can pick up nonlinear interactions between variables in the data that linear regression can't. In our bear wrestling example, a decision tree can pick up on the fact that you should only wrestle large bears when escape is impossible, whereas a linear regression would have had to weigh both factors in the absence of the other.
 - Data documentation: http://archive.ics.uci.edu/ml/datasets/Adult
+- Entropy refers to disorder. The more "mixed together" 1s and 0s are, the higher the entropy.
+- Information gain
+- ID3 algorithm: pseudocode
+```py
+def id3(data, target, columns)
+    1 Create a node for the tree
+    2 If all values of the target attribute are 1, Return the node, with label = 1
+    3 If all values of the target attribute are 0, Return the node, with label = 0
+    4 Use information to gain, find A, the column that splits the data best
+    5 Find the median value in column A
+    6 Split column A into values below or equal to the median (0), and values above the median (1)
+    7 For each possible value (0 or 1), vi, of A,
+    8    Add a new tree branch below Root that corresponds to rows of data where A = vi
+    9    Let Examples(vi) be the subset of examples that have the value vi for A
+   10    Below this new branch add the subtree id3(data[A==vi], target, columns)
+   11 Return Root
+```
+- [ID3 Algorithm Example.html]
+- Other algorithm: CART...
+- [Storing a tree - building up nested dictionary]
+- sklearn.tree library: DecisionTreeClassifier class for classification problems and DecisionTreeRegressor for regression problems. 
+- Trees overfit when they have too much depth and make overly complex rules that match the training data, but aren't able to generalize well to new data. 
+- Avoid overfitting:
+    - "Prune" the tree after we build it to remove unnecessary leaves.
+    - Use ensembling to blend the predictions of many trees.
+    - Restrict the depth of the tree while we're building it:
+        - max_depth - Globally restricts how deep the tree goes
+        - min_samples_split - The minimum number of rows a node should have before it can be split; if this is set to 2. For example, then nodes with 2 rows won't be split, and become leaves instead
+        - min_samples_leaf - The minimum number of rows a leaf must have
+        - min_weight_fraction_leaf - The fraction of input rows a leaf must have
+        - max_leaf_nodes - The maximum number of total leaves; this will cap the count of leaf nodes as the tree is being built
