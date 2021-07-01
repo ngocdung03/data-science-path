@@ -472,7 +472,7 @@ train = data[0:1460]
 test = data[1460:]
 
 train_null_counts = train.isnull().sum()
-df_missing_values = train[train_null_counts[(train_null_counts>0) &
+df_missing_values = train[train_null_counts[(train_null_counts>0) &        # error without parentheses
                                             (train_null_counts<584)].index]
 print(df_missing_values.isnull().sum())
 print(df_missing_values.info())
@@ -679,3 +679,255 @@ votes['party'].value_counts()
 # Find out the 'average' vote for each bill was
 print(votes.mean())
 
+# Euclidean distance
+from sklearn.metrics.pairwise import euclidean_distances
+print(euclidean_distances(votes.iloc[0,3:].values.reshape(1, -1), votes.iloc[1,3:].values.reshape(1, -1)))
+distance = euclidean_distances(votes.iloc[0,3:], votes.iloc[2,3:])
+
+# Train
+import pandas as pd
+from sklearn.cluster import KMeans
+
+kmeans_model = KMeans(n_clusters=2, random_state=1)
+senator_distances = kmeans_model.fit_transform(votes.iloc[:,3:])
+
+# Crosstab to shows whether the clusters tend to break down along party lines or not.
+labels = kmeans_model.labels_
+pd.crosstab(votes['party'], labels)
+
+# Explore the 'outliers'
+democratic_outliers = votes[(labels==1) &(votes['party']=='D')]
+
+# Visualization
+plt.scatter(senator_distances[:,0], senator_distances[:,1],  # np array has no attribute iloc
+            c = labels,
+            linewidths =0)
+plt.show()
+# The most extreme Senators are those who are the furthest away from one cluster. For example, a radical Republican would be as far from the Democratic cluster as possible. 
+# Senators who are in between both clusters are more moderate, as they fall between the views of the two parties.
+
+# Create a formula to find extremists -- we'll cube the distances in both columns of senator_distances, then add them together.
+# If we left the distances as is, the moderate, who is between both parties, seem extreme.
+extremism = (senator_distances**3).sum(axis=1)
+votes['extremism'] = extremism
+votes.sort_values('extremism', inplace = True, ascending = False)  #inplace: overwrite the existing dataframe
+print(votes.head(10))
+
+## K-means clustering
+import pandas as pd
+import numpy as np
+
+nba = pd.read_csv("nba_2013.csv")
+nba.head(3)
+
+point_guards = nba[nba['pos']=='PG']
+point_guards['ppg'] = point_guards['pts'] / point_guards['g']  #points per game column
+
+# Make sure ppg = pts/g
+point_guards[['pts', 'g', 'ppg']].head(5)
+
+# Create a column of Assist Turnover Ratio
+point_guards = point_guards[point_guards['tov'] != 0]
+point_guards['atr'] = point_guards['ast']/point_guards['tov']
+
+# Visualize ppg and atr
+plt.scatter(point_guards['ppg'], point_guards['atr'], c='y')
+plt.title("Point Guards")
+plt.xlabel('Points Per Game', fontsize=13)
+plt.ylabel('Assist Turnover Ratio', fontsize=13)
+plt.show()
+
+# K-means is an iterative algorithm
+num_clusters = 5
+# Use numpy's random function to generate a list, length: num_clusters, of indices
+random_initial_points = np.random.choice(point_guards.index, size=num_clusters)
+
+# Use the random indices to create the centroids
+centroids = point_guards.loc[random_initial_points]
+
+# Visualize where the randomly chosen centroids started out
+plt.scatter(point_guards['ppg'], point_guards['atr'], c='yellow')
+plt.scatter(centroids['ppg'], centroids['atr'], c='red')
+plt.title("Centroids")
+plt.xlabel('Points Per Game', fontsize=13)
+plt.ylabel('Assist Turnover Ratio', fontsize=13)
+plt.show()
+
+# Extract centroid ID and coordinates
+def centroids_to_dict(centroids):
+    dictionary = dict()
+    # iterating counter we use to generate a cluster_id
+    counter = 0
+
+    # iterate a pandas data frame row-wise using .iterrows()
+    for index, row in centroids.iterrows():
+        coordinates = [row['ppg'], row['atr']]
+        dictionary[counter] = coordinates
+        counter += 1
+
+    return dictionary
+
+centroids_dict = centroids_to_dict(centroids)
+
+# Create a function that calculate distance from points to centroid
+import math
+
+def calculate_distance(centroid, player_values):
+    root_distance = 0
+    
+    for x in range(0, len(centroid)):
+        difference = centroid[x] - player_values[x]
+        squared_difference = difference**2
+        root_distance += squared_difference
+
+    euclid_distance = math.sqrt(root_distance)
+    return euclid_distance
+
+q = [5, 2]
+p = [3,1]
+
+# Sqrt(5) = ~2.24
+print(calculate_distance(q, p))
+
+# Step 1: Assign points to the closest centroid
+from sklearn.metrics.pairwise import euclidean_distances
+def assign_to_cluster(row):
+    lowest_distance = euclidean_distances(row[['ppg', 'atr']], centroids_dict[0])  # solution: [row['ppg'], row['atr']]
+    closest_cluster = 0 #solution: lowest_distance and closest_cluster = -1
+    for cluster_id, centroid in centroids_dict.items():
+        distance = euclidean_distances(row[['ppg', 'atr']], centroid) #solution: calculate_distance()
+        if distance < lowest_distance:
+            lowest_distance = distance
+            closest_cluster = cluster_id
+    return closest_cluster                                      
+  
+# applying assign_to_cluster row-by-row
+point_guards['cluster'] = point_guards.apply(lambda row: assign_to_cluster(row), axis=1)
+
+# Visualizing clusters
+def visualize_clusters(df, num_clusters):
+    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+
+    for n in range(num_clusters):
+        clustered_df = df[df['cluster'] == n]
+        plt.scatter(clustered_df['ppg'], clustered_df['atr'], c=colors[n-1])
+        plt.xlabel('Points Per Game', fontsize=13)
+        plt.ylabel('Assist Turnover Ratio', fontsize=13)
+    plt.show()
+
+visualize_clusters(point_guards, 5)
+
+# Step 2: recalculate the centroids for each cluster
+def recalculate_centroids(df):
+    new_centroids_dict = dict()
+    num_clusters = df['cluster'].max() + 1
+    
+    for cluster_id in range(0, num_clusters):
+        players = df[df['cluster']==cluster_id]
+        new_centroid = players[['ppg', 'atr']].mean()   #solution: np.average()
+        new_centroids_dict[cluster_id] = new_centroid
+        return new_centroids_dict
+
+centroids_dict = recalculate_centroids(point_guards)
+
+# Re-run step 1
+point_guards['cluster'] = point_guards.apply(lambda row: assign_to_cluster(row), axis=1)
+visualize_clusters(point_guards, num_clusters)
+
+# Re run step 2
+centroids_dict = recalculate_centroids(point_guards)
+point_guards['cluster'] = point_guards.apply(lambda row: assign_to_cluster(row), axis=1)
+visualize_clusters(point_guards, num_clusters)
+
+# sklearn implementation of K-means re-run the process many times with random initial centroids
+from sklearn.cluster import KMeans
+
+kmeans = KMeans(n_clusters=num_clusters)
+kmeans.fit(point_guards[['ppg', 'atr']])
+point_guards['cluster'] = kmeans.labels_
+
+visualize_clusters(point_guards, num_clusters)
+i
+## Decition trees
+import pandas
+
+# Set index_col to False to avoid pandas thinking that the first column is row indexes (it's age)
+income = pandas.read_csv("income.csv", index_col=False)
+print(income.head(5))
+
+# Convert columns from text categories to numbers
+# If convert the columns to categorical types, pandas displays the labels as strings, but internally store them as numbers so we can do computations with them. The numbers aren't always compatible with other librarie
+raw_cols = ['workclass', 'education', 'marital_status', 'occupation', 'relationship', 'race', 'sex', 'native_country', 'high_income']
+income[raw_cols] = income[raw_cols].apply(lambda col: pandas.Categorical(col).codes, axis=0)   #retain numbers only
+print(income[raw_cols].head(5))
+
+# We are predicting on high_income
+# Compute the information gain for splitting on the age column of income.
+import numpy
+
+def calc_entropy(column):
+    """
+    Calculate entropy given a pandas series, list, or numpy array.
+    """
+    # Compute the counts of each unique value in the column
+    counts = numpy.bincount(column)
+    # Divide by the total column length to get a probability
+    probabilities = counts / len(column)
+    
+    # Initialize the entropy to 0
+    entropy = 0
+    # Loop through the probabilities, and add each one to the total entropy
+    for prob in probabilities:
+        if prob > 0:
+            entropy += prob * math.log(prob, 2)
+    
+    return -entropy
+
+# Verify that our function matches our answer from earlier
+entropy = calc_entropy([1,1,0,0,1])
+print(entropy)
+
+information_gain = entropy - ((.8 * calc_entropy([1,1,0,0])) + (.2 * calc_entropy([1])))
+print(information_gain)
+
+median_age = income["age"].median()
+cut_off = income['age']>median_age
+# print(cut_off.head(10))
+probabilities = (numpy.bincount(cut_off))/len(income['age'])   #? how are values in .bincount() ordered
+age_information_gain = calc_entropy(income['high_income']) - (probabilities[0]*calc_entropy(income['high_income'][-cut_off]) + probabilities[1]*calc_entropy(income['high_income'][cut_off]))
+
+# We'll find the initial variable to split on by calculating which split would have the highest information gain.
+def calc_information_gain(data, split_name, target_name):
+    """
+    Calculate information gain given a data set, column to split on, and target
+    """
+    # Calculate the original entropy
+    original_entropy = calc_entropy(data[target_name])
+    
+    # Find the median of the column we're splitting
+    column = data[split_name]
+    median = column.median()
+    
+    # Make two subsets of the data, based on the median
+    left_split = data[column <= median]
+    right_split = data[column > median]
+    
+    # Loop through the splits and calculate the subset entropies
+    to_subtract = 0
+    for subset in [left_split, right_split]:
+        prob = (subset.shape[0] / data.shape[0]) 
+        to_subtract += prob * calc_entropy(subset[target_name])
+    
+    # Return information gain
+    return original_entropy - to_subtract
+
+# Verify that our answer is the same as on the last screen
+print(calc_information_gain(income, "age", "high_income"))
+
+columns = ["age", "workclass", "education_num", "marital_status", "occupation", "relationship", "race", "sex", "hours_per_week", "native_country"]
+information_gains = []
+for col in columns:
+    information_gain = calc_information_gain(income, col, 'high_income')
+    information_gains.append(information_gain)
+highest_gain_index = information_gains.index(max(information_gains)) # equivalent to which() in R
+highest_gain = columns[highest_gain_index]

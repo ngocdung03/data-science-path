@@ -241,4 +241,31 @@ probabilities[:,1]
     - Overfit models tend to capture the noise as well as the signal in a dataset.
     - A good way to detect if your model is overfitting is to compare the in-sample error and the out-of-sample error
 - Clustering basics
+    - Unsupervised learning is very commonly used with large datasets where it isn't obvious how to start with supervised machine learning. In general, it's a good idea to try unsupervised learning to explore a dataset before trying to use supervised learning machine learning models.
     - In unsupervised learning, we aren't trying to predict anything. Instead, we're trying to find patterns in data.
+    - euclidean_distances() method in sklearn
+    - k-means clustering uses Euclidean distance to form clusters of similar Senators. 
+    - We'll use the KMeans class from scikit-learn to perform the clustering, because we aren't predicting anything. There's no risk of overfitting, so we'll train our model on the whole dataset.  
+    ```py
+    kmeans_model = KMeans(n_clusters=2, random_state=1)
+    ```
+    - fit_transform() method to fit the model: The nth column is the Euclidean distance from each observation to the n cluster
+    - method crosstab(): takes in two vectors or Pandas Series and computes how many times each unique value in the second vector occurs for each unique value in the first vector.
+    - Extract the cluster labels for each Senator from kmeans_model using kmeans_model.labels_
+- K-means clustering:
+    - Dataset info: https://www.basketball-reference.com/leagues/NBA_2014_advanced.html
+    - Centroid based clustering: works well when the clusters resemble circles with centers (or centroids)
+    - Setup K-means is an iterative algorithm that switches between recalculating the centroid of each cluster and the players that belong to that cluster:
+        1. Select k random points and assign their coordinates as initial centroids.
+        2. Assign other points to the closest centroid
+        3. Update new centroids: for each cluster, compute the new centroid.
+        4. Repeat step 2&3 until the new clusters are no longer moving and have converged.
+    - The clusters look like they don't move much after every iteration. This means two things:
+        - K-means doesn't cause significant changes in the makeup of clusters between iterations, meaning that it will always converge and become stable.
+        - Because K-means is *conservative* between iterations, where we pick the initial centroids and how we assign the players to clusters initially matters a great deal.
+    - To counteract these problems, the sklearn implementation of K-means does some intelligent things like re-running the entire clustering process many times with random initial centroids.
+    - alternative ways of clustering data without using centroids?
+
+## Decision Tree
+- One of the major advantages of decision trees is that they can pick up nonlinear interactions between variables in the data that linear regression can't. In our bear wrestling example, a decision tree can pick up on the fact that you should only wrestle large bears when escape is impossible, whereas a linear regression would have had to weigh both factors in the absence of the other.
+- Data documentation: http://archive.ics.uci.edu/ml/datasets/Adult
