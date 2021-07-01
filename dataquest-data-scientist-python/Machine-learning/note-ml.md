@@ -267,7 +267,10 @@ probabilities[:,1]
     - alternative ways of clustering data without using centroids?
 
 ## Decision Tree
-- One of the major advantages of decision trees is that they can pick up nonlinear interactions between variables in the data that linear regression can't. In our bear wrestling example, a decision tree can pick up on the fact that you should only wrestle large bears when escape is impossible, whereas a linear regression would have had to weigh both factors in the absence of the other.
+- One of the major advantages of decision trees is that they can pick up nonlinear interactions between variables in the data that linear regression can't. In our bear wrestling example, a decision tree can pick up on the fact that you should only wrestle large bears when escape is impossible, whereas a linear regression would have had to weigh both factors in the absence of the other. Other advantages:
+    - Easy to interpret
+    - Able to handle multiple types of data
+    - Main disadvantag: tendency to overfit
 - Data documentation: http://archive.ics.uci.edu/ml/datasets/Adult
 - Entropy refers to disorder. The more "mixed together" 1s and 0s are, the higher the entropy.
 - Information gain
@@ -292,11 +295,15 @@ def id3(data, target, columns)
 - sklearn.tree library: DecisionTreeClassifier class for classification problems and DecisionTreeRegressor for regression problems. 
 - Trees overfit when they have too much depth and make overly complex rules that match the training data, but aren't able to generalize well to new data. 
 - Avoid overfitting:
-    - "Prune" the tree after we build it to remove unnecessary leaves.
+    - "Prune" the tree after we build it to remove unnecessary leaves: less often used than parameter optimization and ensembling.
     - Use ensembling to blend the predictions of many trees.
-    - Restrict the depth of the tree while we're building it:
+    - Restrict the depth of the tree while we're building it: (Some of these parameters aren't compatible)
         - max_depth - Globally restricts how deep the tree goes
         - min_samples_split - The minimum number of rows a node should have before it can be split; if this is set to 2. For example, then nodes with 2 rows won't be split, and become leaves instead
         - min_samples_leaf - The minimum number of rows a leaf must have
         - min_weight_fraction_leaf - The fraction of input rows a leaf must have
         - max_leaf_nodes - The maximum number of total leaves; this will cap the count of leaf nodes as the tree is being built
+- High bias can cause underfitting. Underfitting is what occurs when our model is too simple to explain the relationships between the variables.
+- Bias variance tradeoff: http://scott.fortmann-roe.com/docs/BiasVariance.html
+- To see if model is overfitted, introduce noise into the data (add a column of random values). This is because models with high variance are very sensitive to small changes in input data.
+- Random Forests

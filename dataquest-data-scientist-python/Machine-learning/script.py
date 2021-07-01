@@ -1148,3 +1148,16 @@ income = income.reindex(numpy.random.permutation(income.index))
 train_max_row = math.floor(income.shape[0] * .8)
 train = income.iloc[:train_max_row, :]
 test = income.iloc[train_max_row:, :]
+
+from sklearn.metrics import roc_auc_score
+
+clf = DecisionTreeClassifier(random_state=1, min_samples_split = 13)
+clf.fit(train[columns], train["high_income"])
+
+predictions = clf.predict(test[columns])
+error = roc_auc_score(test['high_income'], predictions)
+
+predictions_train = clf.predict(train[columns]) 
+print(roc_auc_score(train['high_income'], predictions_train)) # if the AUC between training set predictions and actual values is significantly higher than the AUC between test set predictions and actual values, it's a sign that the model may be overfitting.
+
+
