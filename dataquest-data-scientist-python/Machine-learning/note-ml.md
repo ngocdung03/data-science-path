@@ -307,3 +307,15 @@ def id3(data, target, columns)
 - Bias variance tradeoff: http://scott.fortmann-roe.com/docs/BiasVariance.html
 - To see if model is overfitted, introduce noise into the data (add a column of random values). This is because models with high variance are very sensitive to small changes in input data.
 - Random Forests
+    - There are many ways to get from the output of multiple models to a final vector of predictions. 
+    - One method is majority voting. This only works if there are more than two classifiers (and ideally an odd number, so we don't have to write a rule to break ties).
+    - DecisionTreeClassifier.predict_proba(): predict a probability from 0 to 1 that a given class is the right one for a row.
+    - The more dissimilar the models used to construct an ensemble are, the stronger their combined predictions will be. For example, **ensembling a decisiontree and a logistic model** will result in stronger predictions than ensembling two decision trees with similar parameters. However, ensembling similar models will result in a negligible boost in the accuracy of the model.
+    - Varation in the random forest will ensure each decision tree is constructed slightly differently and will make different predictions as a result. Bagging and random forest subsets are two main ways to introduce variation in a random forest.
+    - Bagging: sampling with replacement (each row may appear in the 'bag' multiple times) -> train each tree on a 'bag'. 
+    - Random forest subsets: a constrained set of features that is selected randomly
+    - RandomForestClassifier():
+        - n_estimators: how many trees to build. More trees, more accurcacy but running time increases.
+        - bootstrap = True: 'boostrap aggregration' is another name for bagging.
+        - Similar interface to DecisionTreeClassifier: can use fit() and predict()
+    - Main strengths: Very accurate, resistance to overfitting. Main weaknesses: difficult to interpret, take longer to create.
