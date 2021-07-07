@@ -320,3 +320,4 @@ def id3(data, target, columns)
         - Similar interface to DecisionTreeClassifier: can use fit() and predict()
     - Main strengths: Very accurate, resistance to overfitting. Main weaknesses: difficult to interpret, take longer to create.
 - 
+### machine learning 
