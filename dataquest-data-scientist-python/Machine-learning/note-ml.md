@@ -319,4 +319,4 @@ def id3(data, target, columns)
         - bootstrap = True: 'boostrap aggregration' is another name for bagging.
         - Similar interface to DecisionTreeClassifier: can use fit() and predict()
     - Main strengths: Very accurate, resistance to overfitting. Main weaknesses: difficult to interpret, take longer to create.
- ##### Machine Learning
+ 
