@@ -316,6 +316,46 @@ mycindex<-function(days,status,preds){
 
 mycindex(test$month_per, test$FU1_case, y_hat$predicted)
 
+harrell_c <- function(y_true, scores, event){
+  n = length(y_true)
+  #assert (len(scores) == n and len(event) == n)
+  concordant <- 0
+  permissible <- 0
+  ties <- 0
+  result <- 0
+  for(i in 1:n){        
+    for(j in range(i+1): n){
+      if (event[i] != 0 | event[j] != 0){
+        if (event[i] == 1 & event[j] == 1){
+          permissible <-  permissible + 1
+          if(y_true[i] == y_true[j]){
+            ties <- ties+1}
+          else if (y_true[i] > y_true[j] & scores[i] < scores[j]){
+            concordant <-  concordant+1}
+          else if (y_true[i] < y_true[j] & scores[i] > scores[j]){
+            concordant <-  concordant+1}
+        }
+        else if (event[i] == 0 | event[j] == 0){
+          censored <-  j
+          uncensored <-  i
+          if(event[i] == 0){
+            censored <- i
+            uncensored <- j}
+          if(y_true[censored] >= y_true[uncensored]){
+            permissible <- permissible+1
+            if(scores[i] == scores[j]){
+              ties = ties+ 1}
+            if(y_true[censored] >= y_true[uncensored] & scores[censored] < scores[uncensored]){
+              concordant <- concordant+1}}
+        }
+      }
+    }
+  }
+  result <- (concordant + 0.5 * ties) / permissible
+  return(result)
+}
+
+harrell_c(test$month_per, y_hat5$predicted, test$FU1_case)
 #### Plots ####
 glimpse(pca)
 pca$x[1:6, 1:6]
