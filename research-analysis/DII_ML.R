@@ -233,10 +233,14 @@ c_indx
 
 # Export PCA data
 setwd("C:/Users/ngocdung/Dropbox/NCC/DII - perio/Machine learning analysis/PCA dataset")
-data.frame(pcs$x, FU1_case = train$FU1_case, month_per = train$month_per, cov_train) %>% 
-  write.csv('train_pca.csv')
+pcs <- data.frame(pca$rotation, name = colnames(num[,1:36]))
+# train_pca <- data.frame(pcs$x, FU1_case = train$FU1_case, month_per = train$month_per, cov_train) 
+# train_pca %>% 
+#   write.csv('train_pca.csv')
+train_pca <- read.csv('train_pca.csv', stringsAsFactors = F)
 
-data.frame(pcs_test, FU1_case = test$FU1_case, month_per = test$month_per, cov_test) %>% 
+test_pca <- data.frame(pcs_test, FU1_case = test$FU1_case, month_per = test$month_per, cov_test) 
+test_pca %>% 
   write.csv('test_pca.csv')
 
 #### Random forest ####
@@ -249,73 +253,75 @@ train_data_r <- data.frame(pca$x[,1:20], month_per=train$month_per, FU1_case=tra
 set.seed(1)
 train_rf <- rfsrc(Surv(month_per, FU1_case) ~ ., data=train_data_r)
 
+y_hat <- predict(train_rf, newdata=pcs_test)
 y_hat5 <- predict(train_rf, newdata=pcs_test[,1:20])   #class and prob will be error because they are only meant for classification trees. 
 rcorr.cens(x=-5*y_hat5$predicted^2, S=Surv(time = test$month_per, event = test$FU1_case))
 
 #Function for calculating c-index####
-mycindex<-function(days,status,preds){
-  permissible<-1
-  concordance<-1
-  endind=length(preds)-1
-  for (i in seq(1,endind)){
-    tmp=i+1
-    for (j in seq(tmp,length(preds))){
-      
-      if((days[i]==days[j]) & (status[i]==0) & (status[j]==0)){ next } 
-      if((days[i]<days[j]) & (status[i]==0) ){ next } 
-      if((days[j]<days[i]) & (status[j]==0) ){ next } 
-      
-      permissible<-permissible+1
-      
-      if (status[i]==1 & status[j]==1 &  
-          preds[i]>preds[j] & (days[i]>days[j])){
-        concordance<-concordance+1
-        
-        #com_value<-c(concordance,preds[i], preds[j], days[i], days[j])
-        #print (com_value)
-      }
-      if (status[i]==1 & status[j]==1 &  
-          preds[i]<preds[j] & days[i]<days[j]){
-        concordance<-concordance+1
-        
-        com_value<-c(concordance,preds[i], preds[j], days[i], days[j])
-        print (com_value)
-      }
-      
-      if((days[i]==days[j]) & (status[i]==1) & (status[j]==1) & (preds[i]!=preds[j]))
-      {
-        concordance<-concordance+0.5
-        
-      }
-      if((days[i]==days[j]) & (status[i]==1) & (status[j]==0) &  (preds[i]<preds[j]))
-      {
-        concordance<-concordance+1
-        
-      }
-      if((days[i]==days[j]) & (status[i]==0) & (status[j]==1) & (preds[i]>preds[j]))
-      {
-        concordance<-concordance+1
-        
-      }
-      if((days[i]==days[j]) & (status[i]==1) & (status[j]==0) & (preds[i]>=preds[j]))
-      {
-        concordance<-concordance+0.5
-        
-      }
-      if((days[i]==days[j]) & (status[i]==0) & (status[j]==1) & (preds[i]<=preds[j])) {
-        concordance<-concordance+0.5
-        
-      }
-    }
-    
-  }
-  cindex<- concordance/permissible
-  myout<-c(concordance,permissible,cindex)
-  return (cindex)
-}
+# mycindex<-function(days,status,preds){
+#   permissible<-1
+#   concordance<-1
+#   endind=length(preds)-1
+#   for (i in seq(1,endind)){
+#     tmp=i+1
+#     for (j in seq(tmp,length(preds))){
+#       
+#       if((days[i]==days[j]) & (status[i]==0) & (status[j]==0)){ next } 
+#       if((days[i]<days[j]) & (status[i]==0) ){ next } 
+#       if((days[j]<days[i]) & (status[j]==0) ){ next } 
+#       
+#       permissible<-permissible+1
+#       
+#       if (status[i]==1 & status[j]==1 &  
+#           preds[i]>preds[j] & (days[i]>days[j])){
+#         concordance<-concordance+1
+#         
+#         #com_value<-c(concordance,preds[i], preds[j], days[i], days[j])
+#         #print (com_value)
+#       }
+#       if (status[i]==1 & status[j]==1 &  
+#           preds[i]<preds[j] & days[i]<days[j]){
+#         concordance<-concordance+1
+#         
+#         com_value<-c(concordance,preds[i], preds[j], days[i], days[j])
+#         print (com_value)
+#       }
+#       
+#       if((days[i]==days[j]) & (status[i]==1) & (status[j]==1) & (preds[i]!=preds[j]))
+#       {
+#         concordance<-concordance+0.5
+#         
+#       }
+#       if((days[i]==days[j]) & (status[i]==1) & (status[j]==0) &  (preds[i]<preds[j]))
+#       {
+#         concordance<-concordance+1
+#         
+#       }
+#       if((days[i]==days[j]) & (status[i]==0) & (status[j]==1) & (preds[i]>preds[j]))
+#       {
+#         concordance<-concordance+1
+#         
+#       }
+#       if((days[i]==days[j]) & (status[i]==1) & (status[j]==0) & (preds[i]>=preds[j]))
+#       {
+#         concordance<-concordance+0.5
+#         
+#       }
+#       if((days[i]==days[j]) & (status[i]==0) & (status[j]==1) & (preds[i]<=preds[j])) {
+#         concordance<-concordance+0.5
+#         
+#       }
+#     }
+#     
+#   }
+#   cindex<- concordance/permissible
+#   myout<-c(concordance,permissible,cindex)
+#   return (cindex)
+# }
+# 
+# mycindex(test$month_per, test$FU1_case, y_hat$predicted)
 
-mycindex(test$month_per, test$FU1_case, y_hat$predicted)
-
+#####
 harrell_c <- function(y_true, scores, event){
   n = length(y_true)
   #assert (len(scores) == n and len(event) == n)
@@ -355,7 +361,13 @@ harrell_c <- function(y_true, scores, event){
   return(result)
 }
 
-harrell_c(test$month_per, y_hat5$predicted, test$FU1_case)
+#cph.fit(one_hot_train, duration_col = 'month_per', event_col = 'FU1_case', step_size=0.1)
+cox.model <- coxph(Surv(month_per, FU1_case==1)~., data=train_pca)
+test_validation <-  predict(cox.model, newdata = test_pca)  #$predicted
+
+scores_values <- read.csv("../scores_values.csv", stringsAsFactors = F)[2]
+harrell_c(test$month_per, scores_values[,1], test$FU1_case)
+
 #### Plots ####
 glimpse(pca)
 pca$x[1:6, 1:6]
@@ -382,7 +394,7 @@ plot(cumsum(prop_varex),
 library(ggrepel)
 
 # To see that the principal components are actually capturing something important
-pcs <- data.frame(pca$rotation, name = colnames(num[,1:36]))
+
 # pcs %>% data.frame(.,
 #                    Sample = rownames(pcs),
 #                    group = train_obs[match(rownames(pca$x), train_obs$cancer.center.No.) , "group"]) %>%
