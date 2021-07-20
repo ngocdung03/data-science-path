@@ -323,14 +323,14 @@ rcorr.cens(x=-5*y_hat5$predicted^2, S=Surv(time = test$month_per, event = test$F
 
 #####
 harrell_c <- function(y_true, scores, event){
-  n = length(y_true)
+  n <- length(y_true)
   #assert (len(scores) == n and len(event) == n)
   concordant <- 0
   permissible <- 0
   ties <- 0
   result <- 0
-  for(i in 1:n){        
-    for(j in range(i+1): n){
+  for(i in (1:(n-1))){        
+    for(j in ((i+1): n)){
       if (event[i] != 0 | event[j] != 0){
         if (event[i] == 1 & event[j] == 1){
           permissible <-  permissible + 1
@@ -363,10 +363,13 @@ harrell_c <- function(y_true, scores, event){
 
 #cph.fit(one_hot_train, duration_col = 'month_per', event_col = 'FU1_case', step_size=0.1)
 cox.model <- coxph(Surv(month_per, FU1_case==1)~., data=train_pca)
-test_validation <-  predict(cox.model, newdata = test_pca)  #$predicted
+test_validation <-  predict(cox.model, newdata = test_pca) 
 
-scores_values <- read.csv("../scores_values.csv", stringsAsFactors = F)[2]
-harrell_c(test$month_per, scores_values[,1], test$FU1_case)
+scores_values <- read.csv("../scores_values.csv", stringsAsFactors = F)[,2]   #? Xem lai cph.predict_partial_hazard() in Python
+
+harrell_c(test$month_per, scores_values, test$FU1_case)
+
+
 
 #### Plots ####
 glimpse(pca)
