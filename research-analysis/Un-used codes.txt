@@ -1,0 +1,134 @@
+#1\ ? Compare accuracy between total DII model and PCR
+#https://www.biostars.org/p/109215/
+#https://cran.r-project.org/web/packages/survival/vignettes/concordance.pdf 
+which(colnames(local_raw) == "AS1_TRTOTH1NA")
+cov_train <- ds[which(ds$RID %in% train$RID),c('sex','age_c','Smoke', 'Alcoholgp', 'DS1_DM', 'Active')]
+cov_test <- ds[which(ds$RID %in% test$RID),c('sex','age_c','Smoke', 'Alcoholgp', 'DS1_DM', 'Active')] #?check if indices of these 2 sets match train/test set
+pcs_test <- as.data.frame(predict(pca, newdata = test))
+
+c_pca <- function(n_factor){
+  train_data <- data.frame(pca$x[,1:n_factor], 
+                           FU1_case = train$FU1_case, 
+                           month_per = train$month_per, 
+                           cov_train)
+  model <- coxph(Surv(month_per, FU1_case==1)~., data=train_data)
+  test_data <- data.frame(pcs_test[,1:n_factor],
+                          FU1_case = test$FU1_case, 
+                          month_per = test$month_per, 
+                          cov_test)
+  pred_val <-  predict(model, newdata = test_data)
+  c_index <- rcorr.cens(x=pred_val*-1, S=Surv(time = test$month_per, event = test$FU1_case))['C Index']
+  return(c_index)
+}
+
+c_indx <- sapply(2:36, c_pca)  #Error with value 1: 'data' must be a data.frame, environment, or list
+plot(2:36, c_indx, type="l")
+
+c_indx
+
+#2\ PCRegression
+#add a training set with principal components
+train0 <- data.frame(FU1_case = train$FU1_case, month_per = train$month_per, pca$x)
+
+#we are interested in first 5 PCAs
+train1 <- train0[,1:4]      #?number of PCs for tuning later
+cox.model <- coxph(Surv(month_per, FU1_case==1)~., data=train1)
+cox.model
+
+#transform test into PCA
+test0 <- predict(pca, newdata = test)
+test0 <- as.data.frame(test0)
+test1 <- data.frame(FU1_case = test$FU1_case, month_per = test$month_per, test0)
+
+#select the first 5 components?
+test2 <- test0[,1:5]     #!!!remember to remove outcome
+
+## Make prediction on test data and calculate c-index:
+# Compare the c-indices of rcorr.cens and summary(cox.model)
+# https://stats.stackexchange.com/questions/254375/concordance-index-in-survival-and-rms-packages
+train_obj <- Surv(time = train1$month_per, event = train1$FU1_case)
+train_validation <-  predict(cox.model, newdata = train1[,3:7])
+# predict() is a part of hazard function, while train_obj is a survival object.
+# Survival and hazard have opposite directions, therefore, train_validation is multiplied by (-1)
+rcorr.cens(x=train_validation*-1, S=train_obj)
+summary(cox.model)  #concordance(cox.model)
+
+# Create survival estimates on validation data
+pred_validation <-  predict(cox.model, newdata = test2)
+
+# c-index
+rcorr.cens(x=pred_validation*-1, S=Surv(time = test1$month_per, event = test1$FU1_case))['C Index']
+
+#3\ Selecting components 
+#https://www.analyticsvidhya.com/blog/2016/03/pca-practical-guide-principal-component-analysis-python/
+
+#add a training set with principal components
+train0 <- data.frame(thyroid = train$thyroid, survtime = train$survtime, pca$x)
+
+#we are interested in first 35 PCAs
+
+train1 <- train0[,1:37]
+
+#run model
+
+library(survival)
+cox.model <- coxph(Surv(train$survtime, train$thyroid==1)~.,data=train1)
+cox.model
+
+#transform test into PCA
+test0 <- predict(pca, newdata = test)
+test0 <- as.data.frame(test0)
+test1 <- data.frame(thyroid = test$thyroid, survtime = test$survtime, test0)
+
+#select the first 30 components
+test2 <- test1[,1:37]
+
+#make prediction on test data
+cox.prediction <- predict(cox.model, 
+                          test2, 
+                          type = "response")           #check
+
+fit <- (glm(thyroid ~ ., data = train1[,-2], family = "binomial"))
+prediction <- predict(demo, test2[,-2], type ="response")                                                    #The type="response" option tells R to output probabilities of the form P(Y = 1|X)
+
+# Treating with missing value https://stackoverflow.com/questions/19871043/r-package-caret-confusionmatrix-with-missing-categories
+u <- union(round(prediction), test$thyroid)                                                               #Why need to be rounded?
+t <- table(factor(round(prediction), u), factor(test$thyroid, u))
+#Test set
+confusionMatrix(t)$overall["Accuracy"]
+
+train_pre <- predict(demo, train1[,-2], type ="response")
+tr <- table(round(train_pre), train$thyroid)
+confusionMatrix(tr)$overall["Accuracy"]
+
+
+# SEARCH GOOGLE!!!
+# https://stackoverflow.com/questions/50697925/extimate-prediction-accuracy-of-cox-ph
+# https://stats.stackexchange.com/questions/79362/how-to-get-predictions-in-terms-of-survival-time-from-a-cox-ph-model
+# https://stackoverflow.com/questions/27228256/calculate-the-survival-prediction-using-cox-proportional-hazard-model-in-r
+
+confusionMatrix(cox.prediction, (test$thyroid))$overall["Accuracy"]
+
+confusionMatrix(y_hat, test_set$sex)$overall["Accuracy"]
+
+#For fun, finally check your score of leaderboard
+sample <- read.csv("SampleSubmission_TmnO39y.csv")
+final.sub <- data.frame(Item_Identifier = sample$Item_Identifier, Outlet_Identifier = sample$Outlet_Identifier, Item_Outlet_Sales = rpart.prediction)
+
+write.csv(final.sub, "pca.csv",row.names = F)
+
+## Make prediction on test data, type of predicted value:
+# linear predictor ("lp")
+# risk score exp(lp) ("risk")
+# expected number of events given the covariates and follow-up time ("expected")
+# terms of the linear predictor ("terms"). 
+# survival probability for a subject is equal to exp(-expected)
+
+#test3 <- na.omit(test2)
+# cox.prediction <- predict(cox.model, 
+#                           test2,
+#                           type="all")
+
+screeplot(pca, npcs = min(10, length(pca$sdev)),
+          +           type = c("barplot", "lines"),
+          +           main = deparse(substitute(pca)))

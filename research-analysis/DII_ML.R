@@ -132,196 +132,7 @@ quan_crude_adjust <- function(df, var){
 quan_crude_adjust(ds3, ds3$vitamin_B12)
 
 ##### Main analysis #####
-rownames(ds) <- ds$RID
-num <- ds %>%       # is.na(DIINORMAL) and is.na(month_per) were retained
-  dplyr::select(c(RID,
-                  vitamin_B12, vitamin_B6, carotene, caffeine, carbohydrate, cholesterol, total_fat, fiber, folic_acid,  # only 36?      
-                  garlic, fe, mg, MUFA, niacin, n_3_fatty_acides, n_6_fatty_acides, onion, protein, PUFA,            
-                  riboflavin, saturated_fat, se, thiamin, trans_fat, vitamin_A, vitamin_C, vitamin_D, vitamin_E, Zn,              
-                  Green_black_tea, Flavan_3_ol,  Flavones, Flavonols, Flavonones, Anthocyanidins, Isoflavones, FU1_case, month_per))  #60234, ?compare result when month_per NA <- 0
-
-# Describe
-glimpse(num)
-
-# Exclude missing - 134 cases
-num <- na.omit(num)
-
-# log transformation
-
-# Exclude zero variance feature
-head(num[ , which(apply(num, 2, var) == 0)])  #None
-
-# Creating train and test set  ? train:test:validation  70:15:15
-set.seed(1)
-train.index <- createDataPartition(num$FU1_case, p = .8, list = FALSE)   #error when unique(as.numeric(raw$thyroid))
-#train.index[1] == dat5$thyroid
-train <- num[train.index,] %>% #128425
-  mutate(index = "train")
-test <- num[-train.index,] %>%
-  mutate(index = "test") #32106
-
-#PCA
-# Scaling vs. normalization: https://www.kaggle.com/rtatman/data-cleaning-challenge-scale-and-normalize-data#Get-our-environment-set-up
-# Scaling: when you're using methods based on measures of how far apart data points, like support vector machines, or SVM or k-nearest neighbors, or KNN.
-# Normalization: if you're going to be using a machine learning or statistics technique that assumes your data is normally distributed (eg. t-tests, ANOVAs, linear regression, linear discriminant analysis (LDA) and Gaussian naive Bayes).
-pca <- prcomp(train[,2:37], scale=T)   # 3:182 * scale=T,  cor=? #Scaling, compare with the result ..manual scale 
-
-#pca <- prcomp(train_obs[,20:151])   #* scale=T,  cor=?
-
-#####
-# # PCRegression
-# #add a training set with principal components
-# train0 <- data.frame(FU1_case = train$FU1_case, month_per = train$month_per, pca$x)
-# 
-# #we are interested in first 5 PCAs
-# train1 <- train0[,1:4]      #?number of PCs for tuning later 
-# cox.model <- coxph(Surv(month_per, FU1_case==1)~., data=train1)
-# cox.model
-# 
-# #transform test into PCA
-# test0 <- predict(pca, newdata = test)
-# test0 <- as.data.frame(test0)
-# test1 <- data.frame(FU1_case = test$FU1_case, month_per = test$month_per, test0)
-# 
-# #select the first 5 components?
-# test2 <- test0[,1:5]     #!!!remember to remove outcome
-# 
-# ## Make prediction on test data and calculate c-index:
-# # Compare the c-indices of rcorr.cens and summary(cox.model)
-# # https://stats.stackexchange.com/questions/254375/concordance-index-in-survival-and-rms-packages
-# train_obj <- Surv(time = train1$month_per, event = train1$FU1_case)
-# train_validation <-  predict(cox.model, newdata = train1[,3:7])
-# # predict() is a part of hazard function, while train_obj is a survival object. 
-# # Survival and hazard have opposite directions, therefore, train_validation is multiplied by (-1)
-# rcorr.cens(x=train_validation*-1, S=train_obj) 
-# summary(cox.model)  #concordance(cox.model)
-# 
-# # Create survival estimates on validation data
-# pred_validation <-  predict(cox.model, newdata = test2)
-# 
-# # c-index
-# rcorr.cens(x=pred_validation*-1, S=Surv(time = test1$month_per, event = test1$FU1_case))['C Index']
-
-#### Tuning and evaluation####
-# ? Compare accuracy between total DII model and PCR
-#https://www.biostars.org/p/109215/
-#https://cran.r-project.org/web/packages/survival/vignettes/concordance.pdf 
-which(colnames(local_raw) == "AS1_TRTOTH1NA")
-cov_train <- ds[which(ds$RID %in% train$RID),c('sex','age_c','Smoke', 'Alcoholgp', 'DS1_DM', 'Active')]
-cov_test <- ds[which(ds$RID %in% test$RID),c('sex','age_c','Smoke', 'Alcoholgp', 'DS1_DM', 'Active')] #?check if indices of these 2 sets match train/test set
-pcs_test <- as.data.frame(predict(pca, newdata = test))
-
-c_pca <- function(n_factor){
-  train_data <- data.frame(pca$x[,1:n_factor], 
-                           FU1_case = train$FU1_case, 
-                           month_per = train$month_per, 
-                           cov_train)
-  model <- coxph(Surv(month_per, FU1_case==1)~., data=train_data)
-  test_data <- data.frame(pcs_test[,1:n_factor],
-                          FU1_case = test$FU1_case, 
-                          month_per = test$month_per, 
-                          cov_test)
-  pred_val <-  predict(model, newdata = test_data)
-  c_index <- rcorr.cens(x=pred_val*-1, S=Surv(time = test$month_per, event = test$FU1_case))['C Index']
-  return(c_index)
-}
-
-c_indx <- sapply(2:36, c_pca)  #Error with value 1: 'data' must be a data.frame, environment, or list
-plot(2:36, c_indx, type="l")
-
-c_indx
-
-# Export PCA data
-setwd("C:/Users/ngocdung/Dropbox/NCC/DII - perio/Machine learning analysis/PCA dataset")
-pcs <- data.frame(pca$rotation, name = colnames(num[,1:36]))
-# train_pca <- data.frame(pcs$x, FU1_case = train$FU1_case, month_per = train$month_per, cov_train) 
-# train_pca %>% 
-#   write.csv('train_pca.csv')
-train_pca <- read.csv('train_pca.csv', stringsAsFactors = F)
-
-test_pca <- data.frame(pcs_test, FU1_case = test$FU1_case, month_per = test$month_per, cov_test) 
-test_pca %>% 
-  write.csv('test_pca.csv')
-
-#### Random forest ####
-library(randomForest)
-library(randomForestSRC)
-#train_rf <- train(Surv(month_per, FU1_case==1) ~., method = "rpart", data = train)
-train_data_r <- data.frame(pca$x[,1:20], month_per=train$month_per, FU1_case=train$FU1_case) %>% 
-  filter(!is.na(month_per)&month_per>0)
-
-set.seed(1)
-train_rf <- rfsrc(Surv(month_per, FU1_case) ~ ., data=train_data_r)
-
-y_hat <- predict(train_rf, newdata=pcs_test)
-y_hat5 <- predict(train_rf, newdata=pcs_test[,1:20])   #class and prob will be error because they are only meant for classification trees. 
-rcorr.cens(x=-5*y_hat5$predicted^2, S=Surv(time = test$month_per, event = test$FU1_case))
-
 #Function for calculating c-index####
-# mycindex<-function(days,status,preds){
-#   permissible<-1
-#   concordance<-1
-#   endind=length(preds)-1
-#   for (i in seq(1,endind)){
-#     tmp=i+1
-#     for (j in seq(tmp,length(preds))){
-#       
-#       if((days[i]==days[j]) & (status[i]==0) & (status[j]==0)){ next } 
-#       if((days[i]<days[j]) & (status[i]==0) ){ next } 
-#       if((days[j]<days[i]) & (status[j]==0) ){ next } 
-#       
-#       permissible<-permissible+1
-#       
-#       if (status[i]==1 & status[j]==1 &  
-#           preds[i]>preds[j] & (days[i]>days[j])){
-#         concordance<-concordance+1
-#         
-#         #com_value<-c(concordance,preds[i], preds[j], days[i], days[j])
-#         #print (com_value)
-#       }
-#       if (status[i]==1 & status[j]==1 &  
-#           preds[i]<preds[j] & days[i]<days[j]){
-#         concordance<-concordance+1
-#         
-#         com_value<-c(concordance,preds[i], preds[j], days[i], days[j])
-#         print (com_value)
-#       }
-#       
-#       if((days[i]==days[j]) & (status[i]==1) & (status[j]==1) & (preds[i]!=preds[j]))
-#       {
-#         concordance<-concordance+0.5
-#         
-#       }
-#       if((days[i]==days[j]) & (status[i]==1) & (status[j]==0) &  (preds[i]<preds[j]))
-#       {
-#         concordance<-concordance+1
-#         
-#       }
-#       if((days[i]==days[j]) & (status[i]==0) & (status[j]==1) & (preds[i]>preds[j]))
-#       {
-#         concordance<-concordance+1
-#         
-#       }
-#       if((days[i]==days[j]) & (status[i]==1) & (status[j]==0) & (preds[i]>=preds[j]))
-#       {
-#         concordance<-concordance+0.5
-#         
-#       }
-#       if((days[i]==days[j]) & (status[i]==0) & (status[j]==1) & (preds[i]<=preds[j])) {
-#         concordance<-concordance+0.5
-#         
-#       }
-#     }
-#     
-#   }
-#   cindex<- concordance/permissible
-#   myout<-c(concordance,permissible,cindex)
-#   return (cindex)
-# }
-# 
-# mycindex(test$month_per, test$FU1_case, y_hat$predicted)
-
-#####
 harrell_c <- function(y_true, scores, event){
   n <- length(y_true)
   #assert (len(scores) == n and len(event) == n)
@@ -361,13 +172,141 @@ harrell_c <- function(y_true, scores, event){
   return(result)
 }
 
+#Dataset preparation####
+rownames(ds) <- ds$RID
+num <- ds %>%       # is.na(DIINORMAL) and is.na(month_per) were retained
+  dplyr::select(c(RID,
+                  vitamin_B12, vitamin_B6, carotene, caffeine, carbohydrate, cholesterol, total_fat, fiber, folic_acid,  # only 36?      
+                  garlic, fe, mg, MUFA, niacin, n_3_fatty_acides, n_6_fatty_acides, onion, protein, PUFA,            
+                  riboflavin, saturated_fat, se, thiamin, trans_fat, vitamin_A, vitamin_C, vitamin_D, vitamin_E, Zn,              
+                  Green_black_tea, Flavan_3_ol,  Flavones, Flavonols, Flavonones, Anthocyanidins, Isoflavones, FU1_case, month_per))  #60234, ?compare result when month_per NA <- 0
+
+# Describe
+glimpse(num)
+
+# Exclude missing - 134 cases
+num <- na.omit(num)
+
+# log transformation
+
+# Exclude zero variance feature
+head(num[ , which(apply(num, 2, var) == 0)])  #None
+
+# Creating train and test set  ? train:test:validation  70:15:15
+set.seed(1)
+train.index <- createDataPartition(num$FU1_case, p = .8, list = FALSE)   #error when unique(as.numeric(raw$thyroid))
+#train.index[1] == dat5$thyroid
+train <- num[train.index,] %>% #128425
+  mutate(index = "train")
+test <- num[-train.index,] %>%
+  mutate(index = "test") #32106
+
+# PCA ####
+# Scaling vs. normalization: https://www.kaggle.com/rtatman/data-cleaning-challenge-scale-and-normalize-data#Get-our-environment-set-up
+# Scaling: when you're using methods based on measures of how far apart data points, like support vector machines, or SVM or k-nearest neighbors, or KNN.
+# Normalization: if you're going to be using a machine learning or statistics technique that assumes your data is normally distributed (eg. t-tests, ANOVAs, linear regression, linear discriminant analysis (LDA) and Gaussian naive Bayes).
+pca <- prcomp(train[,2:37], scale=T)   # 3:182 * scale=T,  cor=? #Scaling, compare with the result ..manual scale 
+
+#pca <- prcomp(train_obs[,20:151])   #* scale=T,  cor=?
+
+# Export PCA data
+setwd("C:/Users/ngocdung/Dropbox/NCC/DII - perio/Machine learning analysis/PCA dataset")
+pcs <- data.frame(pca$rotation, name = colnames(num[,1:36]))
+which(colnames(local_raw) == "AS1_TRTOTH1NA")
+cov_train <- ds[which(ds$RID %in% train$RID),c('sex','age_c','Smoke', 'Alcoholgp', 'DS1_DM', 'Active')]
+cov_test <- ds[which(ds$RID %in% test$RID),c('sex','age_c','Smoke', 'Alcoholgp', 'DS1_DM', 'Active')] #?check if indices of these 2 sets match train/test set
+pcs_test <- as.data.frame(predict(pca, newdata = test))
+
+# train_pca <- data.frame(pcs$x, FU1_case = train$FU1_case, month_per = train$month_per, cov_train) 
+# train_pca %>% 
+#   write.csv('train_pca.csv')
+train_pca <- read.csv('train_pca.csv', stringsAsFactors = F)
+
+test_pca <- data.frame(pcs_test, FU1_case = test$FU1_case, month_per = test$month_per, cov_test) 
+test_pca %>% 
+  write.csv('test_pca.csv')
+
+# Random forest ####
+library(randomForestSRC)
+# Random Forest
+train_data <- data.frame(num[train.index,], month_per=train$month_per, FU1_case=train$FU1_case) %>%
+  filter(!is.na(month_per)&month_per>0)
+set.seed(1)
+train_rf <- rfsrc(Surv(month_per, FU1_case) ~ ., data=train_data[,2:39]) 
+y_hat <- predict(train_rf, newdata=test[,2:39])   #remove RID and index
+harrell_c(test$month_per, y_hat$predicted, test$FU1_case)
+
+
+# Random Forest + PCA
+train_data_r <- data.frame(pca$x, month_per=train$month_per, FU1_case=train$FU1_case) %>%   #pca$x[,1:20]
+  filter(!is.na(month_per)&month_per>0)
+
+set.seed(1)
+train_rf_pca <- rfsrc(Surv(month_per, FU1_case) ~ ., data=train_data_r)
+# harrell_c(train$month_per[1:48183], train_rf_pca$predicted[1:48183], train$FU1_case[1:48183])   #0.601961
+
+y_hat5 <- predict(train_rf_pca, newdata=pcs_test)   #class and prob will be error because they are only meant for classification trees. 
+harrell_c(test$month_per, y_hat5$predicted, test$FU1_case)  #0.5052552
+
+#? Xem lai cph.predict_partial_hazard() in Python
 #cph.fit(one_hot_train, duration_col = 'month_per', event_col = 'FU1_case', step_size=0.1)
 cox.model <- coxph(Surv(month_per, FU1_case==1)~., data=train_pca)
 test_validation <-  predict(cox.model, newdata = test_pca) 
+scores_values <- read.csv("../scores_values.csv", stringsAsFactors = F)[,2]   
+harrell_c(test$month_per, scores_values, test$FU1_case)  # cph.predict_partial_hazard() in Python, highest 0.55
 
-scores_values <- read.csv("../scores_values.csv", stringsAsFactors = F)[,2]   #? Xem lai cph.predict_partial_hazard() in Python
+# Tuning and evaluation
+set.seed(1)
+train_rf_pca_tune <- rfsrc(Surv(month_per, FU1_case) ~ ., 
+                      tuneGrid = expand.grid(.mtry=c(1:15),.ntree=seq(40, 400, 40)), #data.frame(cp = seq(0.0, 0.1, len = 25)),
+                      data=train_data_r)
+ggplot(train_rf_pca_tune)
+plot(train_rf_pca_tune)
+y_hat_tune <- predict(train_rf_pca_tune, newdata=pcs_test) 
+harrell_c(test$month_per, y_hat_tune$predicted, test$FU1_case)
+###
 
-harrell_c(test$month_per, scores_values, test$FU1_case)
+tune(Surv(month_per, FU1_case) ~ .,
+     data = train_data_r,
+     mtryStart = ncol(train_data_r)/2,
+     ntreeTry =  50)
+
+
+
+# 1
+tune(formula, data,
+    mtryStart = ncol(data) / 2,
+    nodesizeTry = c(1:9, seq(10, 100, by = 5)), ntreeTry = 50)
+
+# 2 sample
+train_rpart <- train(margin ~ ., method = "rpart", tuneGrid = data.frame(cp = seq(0, 0.05, len = 25)), data = polls_2008)
+ggplot(train_rpart)
+
+# 3
+train_rpart <- train(y ~ .,
+                     method = "rpart",
+                     tuneGrid = data.frame(cp = seq(0.0, 0.1, len = 25)),
+                     data = mnist_27$train)
+plot(train_rpart)
+
+# 4
+# use cross validation to choose parameter
+train_rf_2 <- train(y ~ .,
+                    method = "Rborist",		#diff RF algorithm Rborist that is a little bit faster
+                    tuneGrid = data.frame(predFixed = 2, minNode = c(3, 50)),
+                    data = mnist_27$train)
+confusionMatrix(predict(train_rf_2, mnist_27$test), mnist_27$test$y)$overall["Accuracy"]
+
+library(Rborist)		#Rborist faster than random forest package since Computation time is a big challenge in random forest, 
+control <- trainControl(method="cv", number = 5, p = 0.8)   #Because with random forest, the fitting is the slowest part of the procedure rather than the predicting, as with knn, we will only
+# use five-fold cross-validation.
+grid <- expand.grid(minNode = c(1,5) , predFixed = c(10, 15, 25, 35, 50))
+train_rf <-  train(x[, col_index], y,			#There appears to be an issue with Version 0.1-17 of the Rborist package that causes R sessions to abort/terminate. We recommend using an older version of Rborist or not running this code
+                   method = "Rborist",
+                   nTree = 50,				#reduce no. of tree bcs not yet building the final model
+                   trControl = control,
+                   tuneGrid = grid,
+                   nSamp = 5000)			#nSamp: take a random subset of obs when constructing each tree
 
 
 
@@ -427,79 +366,14 @@ p1 <- fviz_contrib(pca, choice="var", axes=1, fill="pink", color="grey", top=10)
 p2 <- fviz_contrib(pca, choice="var", axes=2, fill="skyblue", color="grey", top=10)
 grid.arrange(p1,p2,ncol=2)
 ######################
+# Random Forest
+# model = forest.rfsrc(ro.Formula('Surv(month_per, FU1_case) ~ .'), data=train, ntree=300, nodedepth=5, seed=-1)
+# print(model)
+# result = R.predict(model, newdata=test)
+# scores = np.array(result.rx('predicted')[0])
+# 
+# print("Cox Model Test Score:", cox_test_scores)  
+# print("Survival Forest Test Score:", harrell_c(test['month_per'].values, scores, test['FU1_case'].values))  
 
+# Grid search
 
-##################################################
-## Selecting components 
-#https://www.analyticsvidhya.com/blog/2016/03/pca-practical-guide-principal-component-analysis-python/
-
-#add a training set with principal components
-train0 <- data.frame(thyroid = train$thyroid, survtime = train$survtime, pca$x)
-
-#we are interested in first 35 PCAs
-
-train1 <- train0[,1:37]
-
-#run model
-
-library(survival)
-cox.model <- coxph(Surv(train$survtime, train$thyroid==1)~.,data=train1)
-cox.model
-
-#transform test into PCA
-test0 <- predict(pca, newdata = test)
-test0 <- as.data.frame(test0)
-test1 <- data.frame(thyroid = test$thyroid, survtime = test$survtime, test0)
-
-#select the first 30 components
-test2 <- test1[,1:37]
-
-#make prediction on test data
-cox.prediction <- predict(cox.model, 
-                          test2, 
-                          type = "response")           #check
-
-fit <- (glm(thyroid ~ ., data = train1[,-2], family = "binomial"))
-prediction <- predict(demo, test2[,-2], type ="response")                                                    #The type="response" option tells R to output probabilities of the form P(Y = 1|X)
-
-# Treating with missing value https://stackoverflow.com/questions/19871043/r-package-caret-confusionmatrix-with-missing-categories
-u <- union(round(prediction), test$thyroid)                                                               #Why need to be rounded?
-t <- table(factor(round(prediction), u), factor(test$thyroid, u))
-#Test set
-confusionMatrix(t)$overall["Accuracy"]
-
-train_pre <- predict(demo, train1[,-2], type ="response")
-tr <- table(round(train_pre), train$thyroid)
-confusionMatrix(tr)$overall["Accuracy"]
-
-
-# SEARCH GOOGLE!!!
-# https://stackoverflow.com/questions/50697925/extimate-prediction-accuracy-of-cox-ph
-# https://stats.stackexchange.com/questions/79362/how-to-get-predictions-in-terms-of-survival-time-from-a-cox-ph-model
-# https://stackoverflow.com/questions/27228256/calculate-the-survival-prediction-using-cox-proportional-hazard-model-in-r
-
-confusionMatrix(cox.prediction, (test$thyroid))$overall["Accuracy"]
-
-confusionMatrix(y_hat, test_set$sex)$overall["Accuracy"]
-
-#For fun, finally check your score of leaderboard
-sample <- read.csv("SampleSubmission_TmnO39y.csv")
-final.sub <- data.frame(Item_Identifier = sample$Item_Identifier, Outlet_Identifier = sample$Outlet_Identifier, Item_Outlet_Sales = rpart.prediction)
-
-write.csv(final.sub, "pca.csv",row.names = F)
-
-## Make prediction on test data, type of predicted value:
-# linear predictor ("lp")
-# risk score exp(lp) ("risk")
-# expected number of events given the covariates and follow-up time ("expected")
-# terms of the linear predictor ("terms"). 
-# survival probability for a subject is equal to exp(-expected)
-
-#test3 <- na.omit(test2)
-# cox.prediction <- predict(cox.model, 
-#                           test2,
-#                           type="all")
-
-screeplot(pca, npcs = min(10, length(pca$sdev)),
-          +           type = c("barplot", "lines"),
-          +           main = deparse(substitute(pca)))
