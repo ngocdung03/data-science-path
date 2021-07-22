@@ -133,7 +133,7 @@ quan_crude_adjust(ds3, ds3$vitamin_B12)
 
 ##### Main analysis #####
 #Function for calculating c-index####
-harrell_c <- function(y_true, scores, event){
+harrell_c <- function(y_true, scores, event){   #? catch error if lengths are not equal
   n <- length(y_true)
   #assert (len(scores) == n and len(event) == n)
   concordant <- 0
@@ -214,17 +214,20 @@ setwd("C:/Users/ngocdung/Dropbox/NCC/DII - perio/Machine learning analysis/PCA d
 pcs <- data.frame(pca$rotation, name = colnames(num[,1:36]))
 which(colnames(local_raw) == "AS1_TRTOTH1NA")
 cov_train <- ds[which(ds$RID %in% train$RID),c('sex','age_c','Smoke', 'Alcoholgp', 'DS1_DM', 'Active')]
+pcs_train <- as.data.frame(predict(pca, newdata = train))      #?CHECK
 cov_test <- ds[which(ds$RID %in% test$RID),c('sex','age_c','Smoke', 'Alcoholgp', 'DS1_DM', 'Active')] #?check if indices of these 2 sets match train/test set
 pcs_test <- as.data.frame(predict(pca, newdata = test))
 
-# train_pca <- data.frame(pcs$x, FU1_case = train$FU1_case, month_per = train$month_per, cov_train) 
+train_pca <- data.frame(cov_train, pcs_train, FU1_case = train$FU1_case, month_per = train$month_per) %>%
+  na.omit(.)
 # train_pca %>% 
 #   write.csv('train_pca.csv')
-train_pca <- read.csv('train_pca.csv', stringsAsFactors = F)
+# train_pca <- read.csv('train_pca.csv', stringsAsFactors = F)
 
-test_pca <- data.frame(pcs_test, FU1_case = test$FU1_case, month_per = test$month_per, cov_test) 
-test_pca %>% 
-  write.csv('test_pca.csv')
+test_pca <- data.frame(cov_test, pcs_test, FU1_case = test$FU1_case, month_per = test$month_per) %>%
+  na.omit(.)
+# test_pca %>% 
+#   write.csv('test_pca.csv')
 
 # Random forest ####
 library(randomForestSRC)
@@ -238,24 +241,49 @@ harrell_c(test$month_per, y_hat$predicted, test$FU1_case)
 
 
 # Random Forest + PCA
-train_data_r <- data.frame(pca$x, month_per=train$month_per, FU1_case=train$FU1_case) %>%   #pca$x[,1:20]
-  filter(!is.na(month_per)&month_per>0)
+# train_data_r <- data.frame(pca$x, month_per=train$month_per, FU1_case=train$FU1_case) %>%   #pca$x[,1:20]
+#   filter(!is.na(month_per)&month_per>0)
 
 set.seed(1)
-train_rf_pca <- rfsrc(Surv(month_per, FU1_case) ~ ., data=train_data_r)
+train_rf_pca <- rfsrc(Surv(month_per, FU1_case) ~ ., data=train_pca)
 # harrell_c(train$month_per[1:48183], train_rf_pca$predicted[1:48183], train$FU1_case[1:48183])   #0.601961
 
-y_hat5 <- predict(train_rf_pca, newdata=pcs_test)   #class and prob will be error because they are only meant for classification trees. 
-harrell_c(test$month_per, y_hat5$predicted, test$FU1_case)  #0.5052552
+y_hat5 <- predict(train_rf_pca, newdata=test_pca)   #class and prob will be error because they are only meant for classification trees. 
+harrell_c(test$month_per[1:5], y_hat5$predicted[,1:5], test$FU1_case[1:5])  #0.5349331
 
 #? Xem lai cph.predict_partial_hazard() in Python
 #cph.fit(one_hot_train, duration_col = 'month_per', event_col = 'FU1_case', step_size=0.1)
-cox.model <- coxph(Surv(month_per, FU1_case==1)~., data=train_pca)
+cox.model <- coxph(Surv(month_per, FU1_case==1)~., data=train_pca)  #Error
 test_validation <-  predict(cox.model, newdata = test_pca) 
 scores_values <- read.csv("../scores_values.csv", stringsAsFactors = F)[,2]   
 harrell_c(test$month_per, scores_values, test$FU1_case)  # cph.predict_partial_hazard() in Python, highest 0.55
 
 # Tuning and evaluation
+#? Cach chon tuning param for paca, mtry, ntree
+# Without covariate
+tuning <- function(pca, mtry, ntree, p){
+  c_indice <- vector(length = length(pca)*length(mtry)*length(ntree))
+  z <- 1
+  for (i in pca){
+    for (j in mtry){
+      for (e in ntree){
+        data <- train_pca[1:p,2:(i+1)]  #?check lai
+        model <- rfsrc(Surv(month_per, FU1_case) ~ ., 
+                       mtry = j,
+                       ntree = e,
+                       data=data)
+        yhat <- predict(model, newdata=pcs_test[,1:i])  #?check lai column cua pcs_test
+        c_indice[z] <-  harrell_c(test$month_per, yhat$predicted, test$FU1_case)
+        z = z+1 #? how to identify z
+      }
+    }
+  }
+  return(c_indice)
+}
+
+tuning(5, c(5,7), c(5,10), 5)
+
+##################
 set.seed(1)
 train_rf_pca_tune <- rfsrc(Surv(month_per, FU1_case) ~ ., 
                       tuneGrid = expand.grid(.mtry=c(1:15),.ntree=seq(40, 400, 40)), #data.frame(cp = seq(0.0, 0.1, len = 25)),
