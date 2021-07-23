@@ -132,3 +132,57 @@ write.csv(final.sub, "pca.csv",row.names = F)
 screeplot(pca, npcs = min(10, length(pca$sdev)),
           +           type = c("barplot", "lines"),
           +           main = deparse(substitute(pca)))
+
+# 4\ Grid search
+set.seed(1)
+train_rf_pca_tune <- rfsrc(Surv(month_per, FU1_case) ~ .,
+                      tuneGrid = expand.grid(.mtry=c(1:15),.ntree=seq(40, 400, 40)), #data.frame(cp = seq(0.0, 0.1, len = 25)),
+                      data=train_data_r)
+ggplot(train_rf_pca_tune)
+plot(train_rf_pca_tune)
+y_hat_tune <- predict(train_rf_pca_tune, newdata=pcs_test)
+harrell_c(test$month_per, y_hat_tune$predicted, test$FU1_case)
+###
+
+tune(Surv(month_per, FU1_case) ~ .,
+     data = train_data_r,
+     mtryStart = ncol(train_data_r)/2,
+     ntreeTry =  50)
+
+
+
+# 1
+tune(formula, data,
+    mtryStart = ncol(data) / 2,
+    nodesizeTry = c(1:9, seq(10, 100, by = 5)), ntreeTry = 50)
+
+# 2 sample
+train_rpart <- train(margin ~ ., method = "rpart", tuneGrid = data.frame(cp = seq(0, 0.05, len = 25)), data = polls_2008)
+ggplot(train_rpart)
+
+# 3
+train_rpart <- train(y ~ .,
+                     method = "rpart",
+                     tuneGrid = data.frame(cp = seq(0.0, 0.1, len = 25)),
+                     data = mnist_27$train)
+plot(train_rpart)
+
+# 4
+# use cross validation to choose parameter
+train_rf_2 <- train(y ~ .,
+                    method = "Rborist",		#diff RF algorithm Rborist that is a little bit faster
+                    tuneGrid = data.frame(predFixed = 2, minNode = c(3, 50)),
+                    data = mnist_27$train)
+confusionMatrix(predict(train_rf_2, mnist_27$test), mnist_27$test$y)$overall["Accuracy"]
+
+library(Rborist)		#Rborist faster than random forest package since Computation time is a big challenge in random forest,
+control <- trainControl(method="cv", number = 5, p = 0.8)   #Because with random forest, the fitting is the slowest part of the procedure rather than the predicting, as with knn, we will only
+# use five-fold cross-validation.
+grid <- expand.grid(minNode = c(1,5) , predFixed = c(10, 15, 25, 35, 50))
+train_rf <-  train(x[, col_index], y,			#There appears to be an issue with Version 0.1-17 of the Rborist package that causes R sessions to abort/terminate. We recommend using an older version of Rborist or not running this code
+                   method = "Rborist",
+                   nTree = 50,				#reduce no. of tree bcs not yet building the final model
+                   trControl = control,
+                   tuneGrid = grid,
+                   nSamp = 5000)			#nSamp: take a random subset of obs when constructing each tree
+

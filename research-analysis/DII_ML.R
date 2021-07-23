@@ -192,7 +192,7 @@ num <- na.omit(num)
 # Exclude zero variance feature
 head(num[ , which(apply(num, 2, var) == 0)])  #None
 
-# Creating train and test set  ? train:test:validation  70:15:15
+# Creating train and test set  ? train:test:validation  70:15:15, Cross-validation instead
 set.seed(1)
 train.index <- createDataPartition(num$FU1_case, p = .8, list = FALSE)   #error when unique(as.numeric(raw$thyroid))
 #train.index[1] == dat5$thyroid
@@ -202,6 +202,7 @@ test <- num[-train.index,] %>%
   mutate(index = "test") #32106
 
 # PCA ####
+# Example codes: https://www.analyticsvidhya.com/blog/2016/03/pca-practical-guide-principal-component-analysis-python/
 # Scaling vs. normalization: https://www.kaggle.com/rtatman/data-cleaning-challenge-scale-and-normalize-data#Get-our-environment-set-up
 # Scaling: when you're using methods based on measures of how far apart data points, like support vector machines, or SVM or k-nearest neighbors, or KNN.
 # Normalization: if you're going to be using a machine learning or statistics technique that assumes your data is normally distributed (eg. t-tests, ANOVAs, linear regression, linear discriminant analysis (LDA) and Gaussian naive Bayes).
@@ -232,12 +233,25 @@ test_pca <- data.frame(cov_test, pcs_test, FU1_case = test$FU1_case, month_per =
 # Random forest ####
 library(randomForestSRC)
 # Random Forest
-train_data <- data.frame(num[train.index,], month_per=train$month_per, FU1_case=train$FU1_case) %>%
-  filter(!is.na(month_per)&month_per>0)
+train_data0 <- data.frame(cov_train, 
+                         num[train.index,], 
+                         month_per=train$month_per, 
+                         FU1_case=train$FU1_case) %>%
+  filter(!is.na(month_per)&month_per>0) %>%
+  select(-c("RID","month_per.1","FU1_case.1")) %>%
+  na.omit(.)
+test_data0 <- data.frame(cov_test, 
+                        num[-train.index,], 
+                        month_per=test$month_per, 
+                        FU1_case=test$FU1_case) %>%
+  filter(!is.na(month_per)&month_per>0) %>%
+  select(-c("RID","month_per.1","FU1_case.1")) %>%
+  na.omit(.)
+
 set.seed(1)
-train_rf <- rfsrc(Surv(month_per, FU1_case) ~ ., data=train_data[,2:39]) 
-y_hat <- predict(train_rf, newdata=test[,2:39])   #remove RID and index
-harrell_c(test$month_per, y_hat$predicted, test$FU1_case)
+train_rf <- rfsrc(Surv(month_per, FU1_case) ~ ., data=train_data0) 
+y_hat <- predict(train_rf, newdata=test_data0)   #remove RID and index
+#harrell_c(test_data0$month_per, y_hat$predicted, test_data0$FU1_case)   # 0.521038
 
 
 # Random Forest + PCA
@@ -246,21 +260,38 @@ harrell_c(test$month_per, y_hat$predicted, test$FU1_case)
 
 set.seed(1)
 train_rf_pca <- rfsrc(Surv(month_per, FU1_case) ~ ., data=train_pca)
-# harrell_c(train$month_per[1:48183], train_rf_pca$predicted[1:48183], train$FU1_case[1:48183])   #0.601961
-
 y_hat5 <- predict(train_rf_pca, newdata=test_pca)   #class and prob will be error because they are only meant for classification trees. 
-harrell_c(test_pca$month_per, y_hat5$predicted, test_pca$FU1_case)  #0.5333363
+#harrell_c(test_pca$month_per, y_hat5$predicted, test_pca$FU1_case)  #0.5333363
 
 #? Xem lai cph.predict_partial_hazard() in Python
 #cph.fit(one_hot_train, duration_col = 'month_per', event_col = 'FU1_case', step_size=0.1)
 cox.model <- coxph(Surv(month_per, FU1_case==1)~., data=train_pca)  #Error
 test_validation <-  predict(cox.model, newdata = test_pca) 
 scores_values <- read.csv("../scores_values.csv", stringsAsFactors = F)[,2]   
-harrell_c(test$month_per, scores_values, test$FU1_case)  # cph.predict_partial_hazard() in Python, highest 0.55
+#harrell_c(test$month_per, scores_values, test$FU1_case)  # cph.predict_partial_hazard() in Python, highest 0.55
+
 
 # Tuning and evaluation
 #? Cach chon tuning param for paca, mtry, ntree
 # Without covariate
+# Baseline 
+yhat0 <- rep(0, length(test[,1]))
+harrell_c(test$month_per, yhat0, test$FU1_case) # 0.4897019
+
+# DA co covariate
+model0 <- coxph(Surv(month_per, FU1_case) ~ ., data=train_data0) 
+y_hat0 <- predict(model0, newdata=test_data0, type="risk")  #? should convert to 0 1?
+harrell_c(test_data0$month_per, y_hat0, test_data0$FU1_case) #0.5255954
+
+model_pca <- coxph(Surv(month_per, FU1_case) ~ ., data=data.frame(train_pca[,1:41], 
+                                                                  month_per=train_pca$month_per,
+                                                                  FU1_case=train_pca$FU1_case))
+y_hat_pca <- predict(model_pca, newdata=data.frame(test_pca[,1:41], 
+                                                   month_per=test_pca$month_per,
+                                                   FU1_case=test_pca$FU1_case), type="risk")
+harrell_c(test_pca$month_per, y_hat_pca, test_pca$FU1_case)  #8 PC: 0.5489323, 14 PC: 0.5560487, 19 PC: 0.557166
+
+## Tuning
 tuning_test <- function(pca, mtry, ntree, p){
   c_indice <- vector(length = length(pca)*length(mtry)*length(ntree))
   z <- 1
@@ -286,15 +317,15 @@ tuning_test <- function(pca, mtry, ntree, p){
   return(c_indice)
 }
 
-tuning <- function(pca, mtry, ntree, test_data){
+tuning <- function(pca, mtry, ntree, train_data, test_data){
   c_indice <- vector(length = length(pca)*length(mtry)*length(ntree))
   z <- 1
   for (i in pca){
     for (j in mtry){
       for (e in ntree){
-        data <- data.frame(train_pca[,1:(i+6)],
-                           month_per = train_pca$month_per, 
-                           FU1_case = train_pca$FU1_case,
+        data <- data.frame(train_data[,1:(i+6)],   #?SHOULD check colnames(data) again
+                           month_per = train_data$month_per, 
+                           FU1_case = train_data$FU1_case,
                            row.names = NULL)  #?check lai
         set.seed(1)
         model <- rfsrc(Surv(month_per, FU1_case) ~ ., 
@@ -309,69 +340,22 @@ tuning <- function(pca, mtry, ntree, test_data){
     }
   }
   return(c_indice)
-}
+} 
+tuning(c(36), c(5,7), c(5,10), train_data0, test_data0) #0.5011742 0.5242450 0.5033791 0.4830750
 
-tuning(c(1,5), c(5,7), c(5,10), test_pca)  #0.5030026 0.5012298 0.4884505 0.4855985 0.4855709 0.5033132 0.4837405 0.4844403
+tuning(c(20,36), c(5,7), c(5,10), train_pca, train_pca) 
 
-tuning(c(20,36), c(5,7), c(5,10), test_pca) #0.5094330 0.5049556 0.4713184 0.5105453 0.5214320 0.5146556 0.5092184 0.5092996
-tuning(c(20,36), c(5,7), c(5,10), train_pca)
+tuning(c(1,5), c(5,7), c(5,10), train_pca, test_pca)  #0.5030026 0.5012298 0.4884505 0.4855985 0.4855709 0.5033132 0.4837405 0.4844403
 
-# Q: choose the minimum number of principal components such that 95% of the variance is retained.
+tuning(c(20,36), c(5,7), c(5,10), train_pca, test_pca) #0.5094330 0.5049556 0.4713184 0.5105453 0.5214320 0.5146556 0.5092184 0.5092996
 
-##################
-# set.seed(1)
-# train_rf_pca_tune <- rfsrc(Surv(month_per, FU1_case) ~ ., 
-#                       tuneGrid = expand.grid(.mtry=c(1:15),.ntree=seq(40, 400, 40)), #data.frame(cp = seq(0.0, 0.1, len = 25)),
-#                       data=train_data_r)
-# ggplot(train_rf_pca_tune)
-# plot(train_rf_pca_tune)
-# y_hat_tune <- predict(train_rf_pca_tune, newdata=pcs_test) 
-# harrell_c(test$month_per, y_hat_tune$predicted, test$FU1_case)
-# ###
-# 
-# tune(Surv(month_per, FU1_case) ~ .,
-#      data = train_data_r,
-#      mtryStart = ncol(train_data_r)/2,
-#      ntreeTry =  50)
-# 
-# 
-# 
-# # 1
-# tune(formula, data,
-#     mtryStart = ncol(data) / 2,
-#     nodesizeTry = c(1:9, seq(10, 100, by = 5)), ntreeTry = 50)
-# 
-# # 2 sample
-# train_rpart <- train(margin ~ ., method = "rpart", tuneGrid = data.frame(cp = seq(0, 0.05, len = 25)), data = polls_2008)
-# ggplot(train_rpart)
-# 
-# # 3
-# train_rpart <- train(y ~ .,
-#                      method = "rpart",
-#                      tuneGrid = data.frame(cp = seq(0.0, 0.1, len = 25)),
-#                      data = mnist_27$train)
-# plot(train_rpart)
-# 
-# # 4
-# # use cross validation to choose parameter
-# train_rf_2 <- train(y ~ .,
-#                     method = "Rborist",		#diff RF algorithm Rborist that is a little bit faster
-#                     tuneGrid = data.frame(predFixed = 2, minNode = c(3, 50)),
-#                     data = mnist_27$train)
-# confusionMatrix(predict(train_rf_2, mnist_27$test), mnist_27$test$y)$overall["Accuracy"]
-# 
-# library(Rborist)		#Rborist faster than random forest package since Computation time is a big challenge in random forest, 
-# control <- trainControl(method="cv", number = 5, p = 0.8)   #Because with random forest, the fitting is the slowest part of the procedure rather than the predicting, as with knn, we will only
-# # use five-fold cross-validation.
-# grid <- expand.grid(minNode = c(1,5) , predFixed = c(10, 15, 25, 35, 50))
-# train_rf <-  train(x[, col_index], y,			#There appears to be an issue with Version 0.1-17 of the Rborist package that causes R sessions to abort/terminate. We recommend using an older version of Rborist or not running this code
-#                    method = "Rborist",
-#                    nTree = 50,				#reduce no. of tree bcs not yet building the final model
-#                    trControl = control,
-#                    tuneGrid = grid,
-#                    nSamp = 5000)			#nSamp: take a random subset of obs when constructing each tree
-# 
+tuning(c(19), c(5,7), c(5,10), train_pca, test_pca) #0.4995370 0.5009853 0.5025278 0.4980820
 
+
+# Minimum number of principal components such that percentage of the variance is retained.
+summary(pca)  # 95% - 14 PCs, 98% - 19 PCs
+
+# choose better tuning params for RF
 
 #### Plots ####
 glimpse(pca)
@@ -432,6 +416,80 @@ grid.arrange(p1,p2,ncol=2)
 # Pairplot (beside of biplot)
 # https://github.com/kevinblighe/PCAtools
 
+# ROC
+library(timeROC)
+
+ROC_cox <- timeROC(T = test_pca$month_per,   #Error
+        delta=test_pca$FU1_case,
+        marker=test_pca$sex,
+        #other_markers = as.matrix(test_pca[,2:8]),
+        cause=1,weighting="cox",
+        times=quantile(test_pca$month_per,probs=seq(0.2,0.8,0.1)))
+
+ROC_cox <- timeROC(T = test$month_per,
+                   delta=test$FU1_case,
+                   marker=test$caffeine,
+                   #other_markers = as.matrix(test_pca[,2:8]),
+                   cause=1,weighting="cox",
+                   times=quantile(test$month_per,probs=seq(0.2,0.8,0.1)))
+
+plot(ROC_cox, time=70)
+
+#Sample - time ROC
+library(survival)
+data(pbc)
+head(pbc)
+#pbc<-pbc[!is.na(pbc$trt),] # select only randomised subjects
+pbc$status<-as.numeric(pbc$status==2)
+
+ROC.bili.cox<-timeROC(T=pbc$days,
+                      delta=pbc$status,marker=pbc$bili,
+                      other_markers=as.matrix(pbc[,c("chol","albumin")]),
+                      cause=1,weighting="cox",
+                      times=quantile(pbc$days,probs=seq(0.2,0.8,0.1)))
+plot(ROC.bili.cox, time=2465)
+
+#Sample - pROC
+# https://www.youtube.com/watch?v=qcvAqAH60Yw
+library(pROC)
+par(pty = "s")  # "s" - creates a square plotting region
+
+# use 1-specificity (i.e. the 
+## False Positive Rate) on the x-axis, set "legacy.axes" to TRUE.
+roc(test_pca$FU1_case, y_hat5$predicted, plot=TRUE, legacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Postive Percentage", col="#377eb8", lwd=4)
+
+## If we want to find out the optimal threshold we can store the 
+## data used to make the ROC graph in a variable...
+roc.info <- roc(test_pca$FU1_case, y_hat5$predicted, legacy.axes=TRUE)
+str(roc.info)
+
+## and then extract just the information that we want from that variable.
+roc.df <- data.frame(
+  tpp=roc.info$sensitivities*100, ## tpp = true positive percentage
+  fpp=(1 - roc.info$specificities)*100, ## fpp = false positive precentage
+  thresholds=roc.info$thresholds)
+
+## We can calculate the area under the curve...
+roc(test_pca$FU1_case, y_hat5$predicted, plot=TRUE, legacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Postive Percentage", col="#377eb8", lwd=4, print.auc=TRUE)
+
+## ...and the partial area under the curve.
+roc(test_pca$FU1_case, y_hat5$predicted, plot=TRUE, legacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Postive Percentage", col="#377eb8", lwd=4, print.auc=TRUE, print.auc.x=45, partial.auc=c(100, 90), auc.polygon = TRUE, auc.polygon.col = "#377eb822")
+
+## Now let's fit the data with other model
+#rf.model <- randomForest(factor(obese) ~ weight)
+
+## ROC for other model
+#roc(obese, rf.model$votes[,1], plot=TRUE, legacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Postive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
+roc(test$FU1_case, y_hat0, plot=TRUE, legacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Postive Percentage", col="#4daf4a", lwd=4, print.auc=TRUE)
+
+## Now layer logistic regression and random forest ROC graphs..
+roc(obese, glm.fit$fitted.values, plot=TRUE, legacy.axes=TRUE, percent=TRUE, xlab="False Positive Percentage", ylab="True Postive Percentage", col="#377eb8", lwd=4, print.auc=TRUE)
+
+plot.roc(obese, rf.model$votes[,1], percent=TRUE, col="#4daf4a", lwd=4, print.auc=TRUE, add=TRUE, print.auc.y=40)
+legend("bottomright", legend=c("Logisitic Regression", "Random Forest"), col=c("#377eb8", "#4daf4a"), lwd=4)
+
+# Reset the par()
+par(pty = "m")
 
 ######################
 # Random Forest
