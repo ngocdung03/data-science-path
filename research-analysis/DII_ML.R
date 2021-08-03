@@ -342,19 +342,19 @@ tuning <- function(pca, mtry, ntree, train_data, test_data){
   return(c_indice)
 } 
 
-tuning(c(36), c(5,7), c(5,10), train_data0, test_data0) #0.5011742 0.5242450 0.5033791 0.4830750
-
-tuning(c(20,36), c(5,7), c(5,10), train_pca, train_pca) 
-
-tuning(c(1,5), c(5,7), c(5,10), train_pca, test_pca)  #0.5030026 0.5012298 0.4884505 0.4855985 0.4855709 0.5033132 0.4837405 0.4844403
-
-tuning(c(20,36), c(5,7), c(5,10), train_pca, test_pca) #0.5094330 0.5049556 0.4713184 0.5105453 0.5214320 0.5146556 0.5092184 0.5092996
-
-tuning(c(19), c(5,10,15), c(5, 10), train_pca, test_pca) #0.4995370 0.5009853 0.5025278 0.4980820
-
-tuning(c(19), c(5,10, 15), c(1000), train_pca, test_pca) # 0.5179105 0.5132760 0.5166964
-
-tuning(c(19), c(7,42), c(1000), train_pca, test_pca) # 0.5255396 0.5032033
+# tuning(c(36), c(5,7), c(5,10), train_data0, test_data0) #0.5011742 0.5242450 0.5033791 0.4830750
+# 
+# tuning(c(20,36), c(5,7), c(5,10), train_pca, train_pca) 
+# 
+# tuning(c(1,5), c(5,7), c(5,10), train_pca, test_pca)  #0.5030026 0.5012298 0.4884505 0.4855985 0.4855709 0.5033132 0.4837405 0.4844403
+# 
+# tuning(c(20,36), c(5,7), c(5,10), train_pca, test_pca) #0.5094330 0.5049556 0.4713184 0.5105453 0.5214320 0.5146556 0.5092184 0.5092996
+# 
+# tuning(c(19), c(5,10,15), c(5, 10), train_pca, test_pca) #0.4995370 0.5009853 0.5025278 0.4980820
+# 
+# tuning(c(19), c(5,10, 15), c(1000), train_pca, test_pca) # 0.5179105 0.5132760 0.5166964
+# 
+# tuning(c(19), c(7,42), c(1000), train_pca, test_pca) # 0.5255396 0.5032033
 # Minimum number of principal components such that percentage of the variance is retained.
 summary(pca)  # 95% - 14 PCs, 98% - 19 PCs
 
