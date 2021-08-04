@@ -6,11 +6,13 @@ library(caret)
 library(survival)
 library(Hmisc)
 #library(rms)
-data <- read.csv("C:/Users/ngocdung/Dropbox/NCC/DII - perio/[Server]Perio/data/data.csv", stringsAsFactors=F)
-urban_raw <- read.csv("C:/Users/ngocdung/Dropbox/NCC/KoGES_DATASET (1)/KoGES_DATASET/city_rawdata.csv", stringsAsFactors=F)
-data <- as.data.frame(cbind(data,DS1_DM = urban_raw$DS1_DM))
+setwd('C:/Users/ngocdung/Dropbox/NCC/')
+data <- read.csv("./DII - perio/[Server]Perio/data/data.csv", stringsAsFactors=F)
+urban_raw <- read.csv("./KoGES_DATASET (1)/KoGES_DATASET/city_rawdata.csv", stringsAsFactors=F)
+data <- as.data.frame(cbind(data, urban_raw$DS1_DM, by="RID"))   
 #### Preprocessing ####
-# data already preprocessed
+
+# data are already processed
 
 #### Analysis ####
 one_hot <- function(vect) {
