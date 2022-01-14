@@ -446,13 +446,13 @@ class Fraction:
         return f
     def __eq__(self,other):
         return (self.nr * other.dr) == (self.dr * other.nr)
-    def __lt__(self,other):
+    def __lt__(self,other):  #less than
         return (self.nr * other.dr) < (self.dr * other.nr)
     def __le__(self,other):
         return (self.nr * other.dr) <= (self.dr * other.nr)
-    def __str__(self):
+    def __str__(self):  #convert an instance object into a string - defined for end user
         return f'{self.nr}/{self.dr}'
-    def __repr__(self):
+    def __repr__(self):  #interactive echo - descriptive, unambiguous string representation of the object - for programmers for debugging
         return f'Fraction({self.nr},{self.dr})'
     def _reduce(self):
         h = Fraction.hcf(self.nr, self.dr)
@@ -494,7 +494,219 @@ class Fraction:
 >>>print(L)
 
 # Magic Methods - 3
-def __radd__(self,other):
+def __radd__(self,other):  # reverse method to ensure the operation works well even with different order.
     return self.__add__(other)
 >>f2 = f1+3
 >>f2 = 3 + f1
+
+# in-place method: augmented assignment method
+
+# Inheritance
+class Person:
+    def __init__(self, name, age, address, phone):
+        self.name = name
+        self.age = age
+        self.address = address
+        self.phone = phone
+    def greet(self):
+        print('Hello I am', self.name)
+    def is_adult(self):
+        if self.age > 18:
+            return True
+        else:
+            return False
+def contact_details(self):
+        print(self.address, self.phone)
+
+class Employee(Person):  #subclass
+    pass
+
+emp = Employee('Jack', 30, 'D4, XYZ Street, Delhi', '994477291')
+>>>emp.name
+>>>emp.age
+>>>emp.address
+>>>emp.phone
+>>>emp.greet()
+>>>emp.is_adult()
+>>>emp.contact_details()
+>>>isinstance(emp,Employee) true
+>>>isinstance(emp, Person) true
+>>>is subclass(Employee, Person)
+>>>is subclass(Person, object)
+>>>is subclass(str, object)
+>>>is subclass(int, object)"Python in Depth" by Deepali Srivastava 22
+
+class Employee(Person):
+    def __init__(self, name, age, address, phone, salary,
+office_address, office_phone):
+        super().__init__(name, age, address, phone)
+        self.salary = salary
+        self.office_address = office_address
+        self.office_phone = office_phone
+    def calculate_tax(self):
+        if self.salary < 5000:
+            return 0
+        else:
+            return self.salary * 0.05
+    def contact_details(self):   #overidden method
+        super().contact_details()
+        print(self.office_address, self.office_phone)
+emp = Employee('Jack', 30, 'D4, XYZ Street', '994477291', 8000, 'ABCStreet', '384923993')
+emp.contact_details()
+
+# Multiple Inheritance
+class Teacher:
+    def greet(self):
+        print('I am a Teacher')
+class Student:
+    def greet(self):
+        print('I am a Student')
+class TeachingAssistant(Student, Teacher):
+    def greet(self):
+        print('I am a Teaching Assistant')
+x = TeachingAssistant()
+x.greet()
+>>>TeachingAssistant.__bases__
+
+class Person:
+    def greet(self):
+        print('I am a Person')
+class Teacher(Person):
+    def greet(self):
+        print('I am a Teacher')
+class Student(Person):
+    def greet(self):
+        print('I am a Student')
+class TeachingAssistant(Student, Teacher):
+    def greet(self):
+        print('I am a Teaching Assistant')
+x = TeachingAssistant()
+x.greet()
+>>> help(TeachingAssistant)
+>>>TeachingAssistant.__mro__
+>>> TeachingAssistant.mro()
+>>> x.__class__.__mro__
+
+# MRO and super()
+class Person:
+    def greet(self):
+        print('I am a Person')
+class Teacher(Person):
+    def greet(self):
+        Person.greet(self)
+        print('I am a Teacher')
+class Student(Person):
+    def greet(self):
+    Person.greet(self)
+    print('I am a Student')
+class TeachingAssistant(Student, Teacher):
+    def greet(self):
+        Student.greet(self)
+        Teacher.greet(self)
+        print('I am a Teaching Assistant')
+x = TeachingAssistant()
+x.greet()
+
+class Person:
+    def greet(self):
+        print('I am a Person')
+class Teacher(Person):
+    def greet(self):
+        super().greet()
+        print('I am a Teacher')
+class Student(Person):
+    def greet(self):
+        super().greet()
+        print('I am a Student')
+class TeachingAssistant(Student, Teacher):
+    def greet(self):
+        super().greet()
+        print('I am a Teaching Assistant')
+x = TeachingAssistant()
+x.greet()
+>>>help(TeachingAssistant)
+>>>s = Student()
+>>>s.greet()
+
+# Polymorphism
+class Car:
+    def start(self):
+        print('Engine started')
+    def move(self):
+        print('Car is running')
+    def stop(self):
+        print('Brakes applied')
+
+class Clock:
+    def move(self):
+        print('Tick Tick Tick')
+    def stop(self):
+        print('Clock needles stopped')
+
+class Person:
+    def move(self):
+        print('Person walking')
+    def stop(self):
+        print('Taking rest')
+    def talk(self):
+        print('Hello')
+car = Car()
+clock = Clock()
+person = Person()
+def do_something(x):
+    x.move()
+    x.stop()
+>>do_something(car)
+>>do_something(clock)
+>>do_something(person)
+class Rectangle:
+    name = 'Rectangle'
+    def __init__(self, length, breadth):
+        self.length = length
+        self.breadth = breadth
+    def area(self):
+        return self.length * self.breadth
+    def perimeter(self):
+        return 2 * (self.length + self.breadth)
+
+class Triangle:
+    name = 'Triangle'
+    def __init__(self, s1, s2, s3):
+        self.s1 = s1
+        self.s2 = s2
+        self.s3 = s3
+    def area(self):
+        sp = (self.s1 + self.s2 + self.s3) / 2
+        return ( sp*(sp-self.s1)*(sp-self.s2)*(sp-self.s3) ) ** 0.5
+    def perimeter(self):
+        return self.s1 + self.s2 + self.s3
+
+class Circle:
+    name = 'Circle'
+    def __init__(self, radius):
+        self.radius = radius
+    def area(self):
+        return 3.14 * self.radius * self.radius
+    def perimeter(self):
+        return 2 * 3.14 * self.radius
+r1 = Rectangle(13,25)
+r2 = Rectangle(14,16)
+t1 = Triangle(14,17,12)
+t2 = Triangle(25,33,52)
+c1 = Circle(14)
+c2 = Circle(25)
+
+def find_area_perimeter(shape):
+    print(shape.name)
+    print('Area : ', shape.area() )
+    print('Perimeter : ', shape.perimeter() )
+>>>find_area_perimeter(t2)
+>>>find_area_perimeter(c1)
+>>>find_area_perimeter(r2)
+shapes = [r1,r2,t1,t2,c1,c2]
+total_area = 0
+total_perimeter = 0
+for shape in shapes:
+    total_area += shape.area()
+    total_perimeter += shape.perimeter()
+print(total_area, total_perimeter)
