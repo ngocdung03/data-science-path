@@ -561,7 +561,7 @@ class Teacher:
 class Student:
     def greet(self):
         print('I am a Student')
-class TeachingAssistant(Student, Teacher):
+class TeachingAssistant(Student, Teacher):  # if there are conflicted methods, methods from Student will be prioritized
     def greet(self):
         print('I am a Teaching Assistant')
 x = TeachingAssistant()
@@ -606,6 +606,12 @@ class TeachingAssistant(Student, Teacher):
         print('I am a Teaching Assistant')
 x = TeachingAssistant()
 x.greet()
+
+# to see MRO of a class
+classname.__mro__
+classname.mro()
+help(classname)
+instance.__class__.__mro__
 
 class Person:
     def greet(self):
