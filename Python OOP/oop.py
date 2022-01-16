@@ -716,3 +716,4 @@ for shape in shapes:
     total_area += shape.area()
     total_perimeter += shape.perimeter()
 print(total_area, total_perimeter)
+
