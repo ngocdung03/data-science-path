@@ -626,7 +626,7 @@ class Student(Person):
         print('I am a Student')
 class TeachingAssistant(Student, Teacher):
     def greet(self):
-        super().greet()
+        super().greet()   # this will invoke the next method in MRO sequence instead of repeat the method of each parent method. Moreover, it will be more dynamic.
         print('I am a Teaching Assistant')
 x = TeachingAssistant()
 x.greet()
@@ -635,6 +635,7 @@ x.greet()
 >>>s.greet()
 
 # Polymorphism
+# Ability of code to take different forms depending on the type this it is used. 
 class Car:
     def start(self):
         print('Engine started')
@@ -659,7 +660,7 @@ class Person:
 car = Car()
 clock = Clock()
 person = Person()
-def do_something(x):
+def do_something(x):  #Polymorphism
     x.move()
     x.stop()
 >>do_something(car)
@@ -717,3 +718,4 @@ for shape in shapes:
     total_perimeter += shape.perimeter()
 print(total_area, total_perimeter)
 
+# Overloaded operators: behave differently depending on type of overands - polymorphism
